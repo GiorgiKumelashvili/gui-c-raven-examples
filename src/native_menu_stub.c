@@ -31,3 +31,4 @@ int native_http(const char* method, const char* url, const char* const* names, c
 	callback(0, 0.0, "", NULL, "HTTP is only wired to NSURLSession (macOS) in this app.", user_data);
 	return R_FALSE;
 }
+int native_live_resize_enable(Rid window) { (void)window; return R_FALSE; /* Win32 and X11: Raven draws during resize */ }

@@ -127,6 +127,7 @@ int main(void) {
 		return 1;
 	}
 	Rwindow_set_event_hook(g_window, window_hook, NULL);
+	native_live_resize_enable(g_window);
 	Rxml_set_reload_callback(on_reload, NULL);
 
 	nav_init();

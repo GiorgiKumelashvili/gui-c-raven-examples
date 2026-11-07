@@ -75,6 +75,9 @@ void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void*
 void scroll_contain_init(void);
 void scroll_contain_bind(void);
 
+/* native_macos.m: draw the window while its edge is dragged (instead of stretching the last frame) */
+int native_live_resize_enable(Rid window);
+
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);
 
@@ -191,6 +194,9 @@ void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void*
 /* scroll_contain.c: the wheel stays in the widget that scrolls; Class="no-bounce" ScrollBoxes */
 void scroll_contain_init(void);
 void scroll_contain_bind(void);
+
+/* native_macos.m: draw the window while its edge is dragged (instead of stretching the last frame) */
+int native_live_resize_enable(Rid window);
 
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);

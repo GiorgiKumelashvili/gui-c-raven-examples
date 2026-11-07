@@ -333,3 +333,72 @@ int native_http(const char* method, const char* url, const char* const* names, c
 	}] resume];
 	return R_TRUE;
 }
+
+/* ---------------------------------------------------------------------------
+ *  Live resize, as on the web
+ *
+ *  While the user drags an edge of the window, AppKit runs its own loop on
+ *  the main thread: Raven's frame loop (Rwait_frame) does not turn, and
+ *  Core Animation stretches the last frame to the new size (the content
+ *  "zooms"); Raven lays the window out again only when the mouse is
+ *  released (windowDidEndLiveResize, which runs its update once).
+ *
+ *  Here, during the drag, the same update runs at each change of size and
+ *  60 times a second (a timer in the run loop modes of the drag, so that
+ *  animations go on): the window is laid out and drawn at its new size as
+ *  it changes. Raven's update protects itself against being called inside a
+ *  loop of the platform (g_rvn.in_update). The layer keeps its pixels at the
+ *  top left instead of stretching them, for the moment before a new frame.
+ *
+ *  rvn_update is internal to Raven (src/core/context.h) but not static: it is
+ *  what Raven itself calls for RVN_PEVENT_MODAL_TICK.
+ * ------------------------------------------------------------------------- */
+
+extern void rvn_update(void);
+
+@interface AppLiveResize : NSObject
+@property(nonatomic, strong) NSTimer* timer;
+@property(nonatomic, weak) NSWindow* window;
+@end
+
+@implementation AppLiveResize
+- (void)tick:(NSTimer*)timer {
+	(void)timer;
+	rvn_update();
+}
+- (void)willStart:(NSNotification*)note {
+	(void)note;
+	[self.timer invalidate];
+	self.timer = [NSTimer timerWithTimeInterval:1.0 / 60.0 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+	[[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+}
+- (void)didResize:(NSNotification*)note {
+	(void)note;
+	/* Raven's delegate already told the window its new size (synchronously): draw it */
+	if (self.window.inLiveResize) rvn_update();
+}
+- (void)didEnd:(NSNotification*)note {
+	(void)note;
+	[self.timer invalidate];
+	self.timer = nil;
+}
+@end
+
+int native_live_resize_enable(Rid window) {
+	static NSMutableArray* keep; /* the observers live as long as the app */
+	NSWindow* ns_window = ns_window_of(window);
+	AppLiveResize* live;
+	NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+	if (!ns_window) return R_FALSE;
+	if (!keep) keep = [NSMutableArray array];
+	live = [AppLiveResize new];
+	live.window = ns_window;
+	[keep addObject:live];
+	[center addObserver:live selector:@selector(willStart:) name:NSWindowWillStartLiveResizeNotification object:ns_window];
+	[center addObserver:live selector:@selector(didResize:) name:NSWindowDidResizeNotification object:ns_window];
+	[center addObserver:live selector:@selector(didEnd:) name:NSWindowDidEndLiveResizeNotification object:ns_window];
+	/* between two frames, the old pixels stay where they are instead of being stretched */
+	ns_window.contentView.layer.contentsGravity = kCAGravityTopLeft;
+	ns_window.contentView.layerContentsRedrawPolicy = NSViewLayerContentsRedrawDuringViewResize;
+	return R_TRUE;
+}
