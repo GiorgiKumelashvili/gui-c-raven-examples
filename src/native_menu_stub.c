@@ -24,3 +24,10 @@ int native_notify(const char* title, const char* subtitle, const char* body, int
 }
 int native_dock_badge(const char* text) { (void)text; return R_FALSE; }
 int native_request_attention(void) { return R_FALSE; }
+int native_open_notification_settings(void) { return R_FALSE; }
+int native_http(const char* method, const char* url, const char* const* names, const char* const* values, int count,
+	const char* body, NativeHttpCallback callback, void* user_data) {
+	(void)method; (void)url; (void)names; (void)values; (void)count; (void)body;
+	callback(0, 0.0, "", NULL, "HTTP is only wired to NSURLSession (macOS) in this app.", user_data);
+	return R_FALSE;
+}

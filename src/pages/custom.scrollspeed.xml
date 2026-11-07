@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.scrollspeed" Kind="Custom" Title="Scroll speeds" Subtitle="The same content at five speeds. Raven scrolls every widget at the speed of the system; here a widget with Class=&quot;scroll-speed-N&quot; (and what it contains) scrolls at N percent: the window hook scales the wheel before the widget sees it (demos.c). The whole app also keeps each swipe on its main axis (rails), so a vertical swipe no longer drifts sideways.">
+	<Demo Title="ScrollBox" Note="Put the pointer over a column and scroll the same amount in each.">
+		<UniformGrid Columns="5" Spacing="10">
+			<VBox Spacing="6">
+				<Label Text="0.25x  (slow)" TextAlign="Center" Opacity="0.7"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
+					<ScrollBox Class="scroll-speed-25">
+						<VBox Spacing="0">
+							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+						</VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+			<VBox Spacing="6">
+				<Label Text="0.5x" TextAlign="Center" Opacity="0.7"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
+					<ScrollBox Class="scroll-speed-50">
+						<VBox Spacing="0">
+							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+						</VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+			<VBox Spacing="6">
+				<Label Text="1x  (system)" TextAlign="Center" Opacity="0.7"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
+					<ScrollBox>
+						<VBox Spacing="0">
+							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+						</VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+			<VBox Spacing="6">
+				<Label Text="2x" TextAlign="Center" Opacity="0.7"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
+					<ScrollBox Class="scroll-speed-200">
+						<VBox Spacing="0">
+							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+						</VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+			<VBox Spacing="6">
+				<Label Text="4x  (fast)" TextAlign="Center" Opacity="0.7"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
+					<ScrollBox Class="scroll-speed-400">
+						<VBox Spacing="0">
+							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+						</VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+		</UniformGrid>
+	</Demo>
+	<Demo Title="Other widgets" Note="The class works on anything that scrolls: a list at half speed, a code editor at triple speed.">
+		<HBox Spacing="12" Height="220">
+			<ListView Class="scroll-speed-50" Slot.Fill="1" Items="Mercury|Venus|Earth|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|Ceres|Eris|Haumea|Makemake|Io|Europa|Ganymede|Callisto|Titan|Enceladus|Triton|Charon|Phobos|Deimos|Moon"/>
+			<TextEditor Class="scroll-speed-300" Language="C" LineNumbers="true" Slot.Fill="2" ReadOnly="true"><![CDATA[/* 3x: one notch of the wheel goes a long way */
+#include <Raven.h>
+int main(void) {
+	Rinit();
+	Rid window = Rwindow_create_from_xml_file("main.xml");
+	while (Rwait_frame(-1.0)) {
+	}
+	Rshutdown();
+	return 0;
+}
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* scroll */
+/* the end */]]></TextEditor>
+		</HBox>
+	</Demo>
+	<Demo Title="Rails" Note="A swipe is locked to its main axis once it has gone a third of a line; to scroll sideways, swipe clearly sideways (2.5 times more than up or down). Shift + wheel is always sideways.">
+		<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="180">
+			<ScrollBox ScrollBoth="true">
+				<VBox Spacing="0">
+					<Repeat Count="40" Var="i">
+						<Label Font="monospace" Text="{i + 1}  - a long line that goes far to the right, so that the box scrolls both ways: ......................................................................................................................." Slot.Padding="12,4"/>
+					</Repeat>
+				</VBox>
+			</ScrollBox>
+		</Border>
+	</Demo>
+</Page>

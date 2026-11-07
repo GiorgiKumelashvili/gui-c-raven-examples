@@ -147,4 +147,54 @@
 		<TextEditor Text="{Text}" Placeholder="{Placeholder}" LineNumbers="false" Wrap="true" Completion="false" AutoPairs="false"
 			Zoomable="false" Color.RowHovered="transparent" Height="{Lines * 22 + 18}"/>
 	</Widget>
+
+	<!--
+	  The list of the omni bar: a RoundList (src/roundlist.c, rows as rounded as
+	  the card) in a rounded frame; the padding keeps the rows off its corners.
+	-->
+	<Widget Name="OmniList" List="" Height="300">
+		<Border CornerRadius="12" BorderWidth="1" Padding="5" Background="#8080800F">
+			<RoundList Name="{List}" Height="{Height}" RowHeight="32" RowRadius="8"/>
+		</Border>
+	</Widget>
+
+	<!-- a header of the HTTP page: [on][name][value][delete] (http.c reads the children in this order) -->
+	<Widget Name="HeaderRow">
+		<HBox Spacing="6">
+			<Checkbox Checked="true" Slot.VAlign="Center" Tooltip="Send this header"/>
+			<TextInput Placeholder="Header" Width="190"/>
+			<TextInput Placeholder="Value" Slot.Fill="1"/>
+			<Button Style="Flat" OnClicked="http.header.delete" Tooltip="Delete this header">
+				<Image Source="icons/close.svg" Width="11" Height="11" TintText="true"/>
+			</Button>
+		</HBox>
+	</Widget>
+
+	<!--
+	  Neobrutalism accordion item (custom): thick black outline, a hard offset
+	  shadow (a black Border behind, shifted by the paddings), a yellow header
+	  when open. demos.c ("neo:N") opens one at a time and paints the header.
+	-->
+	<Widget Name="NeoItem" Index="0" Title="" Text="">
+		<Overlay>
+			<Border Background="#111111" CornerRadius="8" Slot.Padding="6,6,0,0"/>
+			<Border BorderWidth="3" BorderColor="#111111" Background="#FFFFFF" CornerRadius="8" Padding="0" Clip="true" Slot.Padding="0,0,6,6">
+				<VBox>
+					<Border Name="neo_head_{Index}" Background="#FFFFFF" CornerRadius="5" Padding="0">
+						<Button Style="Flat" OnClicked="neo:{Index}" Metric.ControlHeight="54" Metric.CornerRadius="0"
+							Color.ControlHovered="#0000000F" Color.ControlPressed="#0000001F">
+							<HBox Slot.Padding="16,0">
+								<Label Text="{Title}" TextSize="17" Color="#111111" Slot.Fill="1" Slot.VAlign="Center"/>
+								<Label Name="neo_sign_{Index}" Text="+" TextSize="24" Color="#111111" Slot.VAlign="Center"/>
+							</HBox>
+						</Button>
+					</Border>
+					<VBox Name="neo_body_{Index}" Visibility="Collapsed">
+						<Border Background="#111111" Height="3" CornerRadius="0"/>
+						<Label Text="{Text}" Wrap="true" Color="#111111" TextSize="14" Slot.Padding="16,14,16,16"/>
+					</VBox>
+				</VBox>
+			</Border>
+		</Overlay>
+	</Widget>
 </Widgets>

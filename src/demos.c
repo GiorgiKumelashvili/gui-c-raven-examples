@@ -12,6 +12,7 @@
  *   menu.*              an item of the menu bar: says which
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,12 +82,12 @@ static void on_modal(Rid sender, const char* action, void* user_data) {
 		Rid content = Rwidget_create_from_xml_file(APP_UI_DIR "/dialogs/invite.xml");
 		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
 	} else if (strcmp(action, "modal.open.edge") == 0 || strcmp(action, "modal.open.hairline") == 0) {
-		Rid content = Rwidget_create_from_xml_file(strcmp(action, "modal.open.edge") == 0
-			? APP_UI_DIR "/dialogs/edge.xml" : APP_UI_DIR "/dialogs/hairline.xml");
-		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
+		/* the app's own modal: Raven's dialog would add its frame and margin around the card */
+		app_modal_open(strcmp(action, "modal.open.edge") == 0 ? APP_UI_DIR "/dialogs/edge.xml" : APP_UI_DIR "/dialogs/hairline.xml");
 	} else if (strcmp(action, "modal.done") == 0) {
 		set_label("modal_result", "Closed with its button.");
-		Rdialog_close(sender, 1);
+		if (app_modal_contains(sender)) app_modal_close();
+		else Rdialog_close(sender, 1);
 	} else if (strcmp(action, "modal.open.terms") == 0) {
 		Rid content = Rwidget_create_from_xml_file(APP_UI_DIR "/dialogs/terms.xml");
 		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
@@ -106,7 +107,12 @@ static void on_modal(Rid sender, const char* action, void* user_data) {
 		set_label("modal_result", "Terms accepted.");
 		Rdialog_close(sender, 1);
 	} else if (strcmp(action, "modal.cancel") == 0) {
-		Rdialog_close(sender, 0);
+		if (app_modal_contains(sender)) {
+			app_modal_close();
+			set_label("modal_result", "The modal was cancelled.");
+		} else {
+			Rdialog_close(sender, 0);
+		}
 	}
 }
 
@@ -172,8 +178,8 @@ static int noanim_hook(const REvent* event) {
 
 static void noanim_frame(void) {
 	if (!g_noanim) return;
-	/* a few frames without any popup: the menu or the list is closed */
-	if (Rwindow_has_popup(g_window)) g_noanim_quiet_frames = 0;
+	/* a few frames without any popup nor a button held: the menu, the list or the click is over */
+	if (Rwindow_has_popup(g_window) || Rwindow_is_mouse_button_down(g_window, R_MOUSE_LEFT)) g_noanim_quiet_frames = 0;
 	else if (++g_noanim_quiet_frames > 3) {
 		g_noanim = 0;
 		Rset_animations_enabled(R_TRUE);
@@ -182,11 +188,182 @@ static void noanim_frame(void) {
 
 static double g_attention_at;
 
+/*
+ * Input adjustments for the whole window, made in the window hook before any
+ * widget sees the event:
+ *
+ *  - Cocoa gives the arrow and function keys characters of the private use
+ *    area (0xF700..0xF8FF); Raven passes them on as typed text, so a focused
+ *    text field got an invisible character for each Up or Down. Dropped.
+ *
+ *  - Raven's lists, trees and tables learn the row under the pointer only
+ *    when the pointer moves, so while the content scrolls under a still
+ *    pointer their hover stays on a row that went away. As in a web page,
+ *    the hover of the list being scrolled is hidden during the scroll; when
+ *    the scroll stops, the pointer is "moved" where it is (the list finds its
+ *    row) and the hover comes back.
+ *
+ *  - Rails: a trackpad never scrolls perfectly straight, so a vertical swipe
+ *    also scrolled a little sideways. Each gesture is locked to the axis it
+ *    mostly goes along; scrolling sideways needs a clearly sideways swipe.
+ *
+ *  - Speeds: a widget with Class="scroll-speed-N" (and what it contains)
+ *    scrolls at N percent.
+ *
+ * Changing the wheel event works because the hook receives the event that
+ * Raven then gives to the widgets (window.c: rvn_window_mouse_wheel); the
+ * struct is the window's, only the pointer to it is const.
+ */
+static Rid g_hover_hidden = R_INVALID_ID;
+static float g_hover_color[4];
+static double g_wheel_last;
+static float g_pointer_x, g_pointer_y;
+
+#define RAIL_GAP 0.25      /* seconds without wheel: a new gesture */
+#define RAIL_DECIDE 0.35f  /* lines of motion before the axis is chosen */
+#define RAIL_RATIO 2.5f    /* sideways must be this many times the vertical motion to win */
+static int g_rail;         /* 0 undecided, 1 vertical, 2 horizontal, 3 free (diagonal) */
+static float g_rail_x, g_rail_y;
+
+static Rid list_under(Rid widget) {
+	for (; widget != R_INVALID_ID; widget = Rwidget_get_parent(widget)) {
+		RWidgetType type = Rwidget_get_type(widget);
+		if (type == R_WIDGET_LIST_VIEW || type == R_WIDGET_TREE_VIEW || type == R_WIDGET_TABLE || type == R_WIDGET_TILE_VIEW) return widget;
+	}
+	return R_INVALID_ID;
+}
+
+static float speed_of(Rid widget) {
+	for (; widget != R_INVALID_ID; widget = Rwidget_get_parent(widget)) {
+		const char* classes = Rwidget_get_class(widget);
+		const char* found = classes ? strstr(classes, "scroll-speed-") : NULL;
+		if (found) return (float)atof(found + 13) / 100.0f;
+	}
+	return 1.0f;
+}
+
+/* inject: R_TRUE outside of an event (a frame), so that the list finds the row under the
+ * pointer; inside the hook the real move that is going on does it, and injecting there would nest */
+static void hover_restore(int inject) {
+	float r, g, b, a;
+	if (g_hover_hidden == R_INVALID_ID) return;
+	if (inject) Rwindow_inject_mouse_move(g_window, g_pointer_x, g_pointer_y);
+	Rwidget_clear_color(g_hover_hidden, R_COLOR_ROW_HOVERED);
+	Rwidget_get_color(g_hover_hidden, R_COLOR_ROW_HOVERED, &r, &g, &b, &a);
+	/* a list that had a color of its own in its XML (the sidebar) gets it back */
+	if (r != g_hover_color[0] || g != g_hover_color[1] || b != g_hover_color[2] || a != g_hover_color[3]) {
+		Rwidget_set_color(g_hover_hidden, R_COLOR_ROW_HOVERED, g_hover_color[0], g_hover_color[1], g_hover_color[2], g_hover_color[3]);
+	}
+	g_hover_hidden = R_INVALID_ID;
+}
+
+static void rails(REvent* event, double now) {
+	float ax, ay;
+	if (now - g_wheel_last > RAIL_GAP) {
+		g_rail = 0;
+		g_rail_x = g_rail_y = 0.0f;
+	}
+	ax = fabsf(event->wheel_x);
+	ay = fabsf(event->wheel_y);
+	if (g_rail == 0) {
+		g_rail_x += ax;
+		g_rail_y += ay;
+		if (g_rail_x + g_rail_y >= RAIL_DECIDE) {
+			if (g_rail_x > g_rail_y * RAIL_RATIO) g_rail = 2;
+			else if (g_rail_y > g_rail_x * 0.4f) g_rail = 1;
+			else g_rail = 3;
+		}
+	}
+	/* before the decision, and on the vertical rail, the sideways part goes */
+	if (g_rail == 0 || g_rail == 1) event->wheel_x = 0.0f;
+	else if (g_rail == 2) event->wheel_y = 0.0f;
+}
+
+static int input_fix_hook(const REvent* event) {
+	if (event->type == R_EVENT_TEXT && event->codepoint >= 0xF700 && event->codepoint <= 0xF8FF) return R_TRUE;
+	if (event->type == R_EVENT_MOUSE_WHEEL) {
+		REvent* wheel = (REvent*)event;
+		double now = Rget_time();
+		Rid list;
+		float speed;
+		/* Shift + wheel is sideways on purpose: no rails then */
+		if (!(event->modifiers & R_MOD_SHIFT)) rails(wheel, now);
+		speed = speed_of(event->target);
+		wheel->wheel_x *= speed;
+		wheel->wheel_y *= speed;
+		g_wheel_last = now;
+		g_pointer_x = event->x;
+		g_pointer_y = event->y;
+		list = list_under(event->target);
+		if (list != g_hover_hidden) {
+			hover_restore(R_FALSE);
+			if (list != R_INVALID_ID) {
+				Rwidget_get_color(list, R_COLOR_ROW_HOVERED, &g_hover_color[0], &g_hover_color[1], &g_hover_color[2], &g_hover_color[3]);
+				Rwidget_set_color(list, R_COLOR_ROW_HOVERED, 0.0f, 0.0f, 0.0f, 0.0f);
+				g_hover_hidden = list;
+			}
+		}
+		Rwake_up();
+	} else if (event->type == R_EVENT_MOUSE_MOVE) {
+		g_pointer_x = event->x;
+		g_pointer_y = event->y;
+		/* the pointer moved by itself (not the move this file injects): the hover may come back */
+		if (g_hover_hidden != R_INVALID_ID && (event->delta_x != 0.0f || event->delta_y != 0.0f) && Rget_time() - g_wheel_last > 0.08) {
+			hover_restore(R_FALSE);
+		}
+	}
+	return R_FALSE;
+}
+
+/* The terminal laid over the dock area: its top edge is dragged (layout.dock.xml). */
+static int g_dock_resizing;
+static float g_dock_start_y, g_dock_start_h;
+
+static int dock_resize_hook(const REvent* event) {
+	Rid console, grip, area;
+	float x, y, w, h, ay, ah, height;
+	if (event->type == R_EVENT_MOUSE_DOWN && event->button == R_MOUSE_LEFT) {
+		grip = W("dock4_grip");
+		if (grip == R_INVALID_ID || Rwidget_get_visibility(W("dock4_console")) != R_VISIBLE) return R_FALSE;
+		Rwidget_get_rect(grip, &x, &y, &w, &h);
+		if (event->x < x || event->x >= x + w || event->y < y - 2.0f || event->y >= y + h + 2.0f) return R_FALSE;
+		Rwidget_get_rect(W("dock4_console"), &x, &y, &w, &h);
+		g_dock_resizing = 1;
+		g_dock_start_y = event->y;
+		g_dock_start_h = h;
+		return R_TRUE;
+	}
+	if (!g_dock_resizing) return R_FALSE;
+	if (event->type == R_EVENT_MOUSE_MOVE) {
+		console = W("dock4_console");
+		area = W("dock4_area");
+		Rwidget_get_rect(area, &x, &ay, &w, &ah);
+		height = g_dock_start_h - (event->y - g_dock_start_y);
+		if (height < 70.0f) height = 70.0f;
+		if (height > ah - 30.0f) height = ah - 30.0f;
+		Rwidget_set_size(console, -1.0f, height);
+		return R_TRUE;
+	}
+	if (event->type == R_EVENT_MOUSE_UP) {
+		g_dock_resizing = 0;
+		return R_TRUE;
+	}
+	return R_FALSE;
+}
+
+/* Each frame: a scroll that ended gives the hover back. */
+static void input_fix_frame(void) {
+	if (g_hover_hidden == R_INVALID_ID) return;
+	if (Rget_time() - g_wheel_last > 0.3) hover_restore(R_TRUE);
+	else Rwake_up();
+}
+
 static void on_frame(double delta, void* user_data) {
 	char text[48];
 	(void)user_data;
 	noanim_frame();
 	reorder_frame();
+	input_fix_frame();
 	if (g_attention_at > 0.0 && Rget_time() >= g_attention_at) {
 		g_attention_at = 0.0;
 		native_request_attention();
@@ -505,9 +682,6 @@ static void on_notify(Rid sender, const char* action, void* user_data) {
 	} else if (strcmp(action, "notify.delayed") == 0) {
 		native_notify("Reminder", "Stand-up in 5 minutes", "Scheduled 5 seconds ago. Switch to another app to see it arrive.", 1, 5.0, on_notify_status, NULL);
 		set_label("notify_status", "Scheduling...");
-	} else if (strcmp(action, "notify.raven") == 0) {
-		int shown = Rnotification_show("Raven's own API", "Rnotification_show: the notification of the system, where Raven can.", R_NOTIFICATION_NORMAL);
-		set_label("notify_status", shown ? "Rnotification_show: shown by Raven" : "Rnotification_show: not available (the app is not a bundle?)");
 	} else if (strcmp(action, "notify.badge") == 0) {
 		snprintf(text, sizeof(text), "%d", ++badge);
 		native_dock_badge(text);
@@ -516,6 +690,8 @@ static void on_notify(Rid sender, const char* action, void* user_data) {
 		badge = 0;
 		native_dock_badge(NULL);
 		set_label("notify_status", "Badge cleared.");
+	} else if (strcmp(action, "notify.settings") == 0) {
+		native_open_notification_settings();
 	} else if (strcmp(action, "notify.attention") == 0) {
 		g_attention_at = Rget_time() + 3.0;
 		set_label("notify_status", "Switch to another app now: the Dock icon bounces in 3 seconds.");
@@ -557,7 +733,27 @@ static void on_value(Rid sender, const char* action, void* user_data) {
 	(void)user_data;
 	text[0] = '\0';
 	if (strcmp(action, "date.changed") == 0) {
+		const char* name = Rwidget_get_name(sender);
 		snprintf(text, sizeof(text), "Chosen: %s", Rdate_picker_get_text(sender));
+		set_label("date_status", text);
+		if (name && strcmp(name, "jump_picker") == 0) {
+			/* the calendar moved: the month and the year follow */
+			int y, m, d;
+			Rdate_picker_get_date(sender, &y, &m, &d);
+			Rcombo_box_set_selected(W("jump_month"), m - 1);
+			Rspin_box_set_value(W("jump_year"), y);
+		}
+	} else if (strcmp(action, "date.jump") == 0) {
+		/* a month or a year chosen: the date goes there, the day kept when the month has it */
+		int y, m, d, days;
+		Rid picker = W("jump_picker");
+		Rdate_picker_get_date(picker, &y, &m, &d);
+		m = Rcombo_box_get_selected(W("jump_month")) + 1;
+		y = (int)Rspin_box_get_value(W("jump_year"));
+		days = (m == 2) ? ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0 ? 29 : 28) : (m == 4 || m == 6 || m == 9 || m == 11) ? 30 : 31;
+		if (d > days) d = days;
+		Rdate_picker_set_date(picker, y, m, d);
+		snprintf(text, sizeof(text), "Chosen: %s", Rdate_picker_get_text(picker));
 		set_label("date_status", text);
 	} else if (strcmp(action, "time.changed") == 0) {
 		int h, m, s;
@@ -605,11 +801,74 @@ static void on_demo_crumb(Rid breadcrumb, int index, void* user_data) {
 	set_label("crumbs_status", text);
 }
 
+/* Neobrutalism accordion: one item open at a time, its header yellow. */
+static void neo_open(int index) {
+	char name[32];
+	int i, open;
+	for (i = 0; i < 16; i++) {
+		Rid body, head, sign;
+		snprintf(name, sizeof(name), "neo_body_%d", i);
+		body = W(name);
+		if (body == R_INVALID_ID) continue;
+		snprintf(name, sizeof(name), "neo_head_%d", i);
+		head = W(name);
+		snprintf(name, sizeof(name), "neo_sign_%d", i);
+		sign = W(name);
+		/* the one clicked toggles; the others close */
+		open = i == index && Rwidget_get_visibility(body) != R_VISIBLE;
+		Rwidget_set_visibility(body, open ? R_VISIBLE : R_COLLAPSED);
+		if (head != R_INVALID_ID) Rborder_set_background(head, open ? 1.0f : 1.0f, open ? 0.87f : 1.0f, open ? 0.10f : 1.0f, 1.0f);
+		if (sign != R_INVALID_ID) Rlabel_set_text(sign, open ? "-" : "+");
+	}
+}
+
+/* Raven's Expanders made an accordion: the one that opens closes its siblings. */
+static void accordion_exclusive(Rid expander) {
+	Rid parent = Rwidget_get_parent(expander);
+	int i;
+	if (!Rexpander_is_expanded(expander) || parent == R_INVALID_ID) return;
+	for (i = 0; i < Rwidget_get_child_count(parent); i++) {
+		Rid sibling = Rwidget_get_child(parent, i);
+		if (sibling != expander && Rwidget_get_type(sibling) == R_WIDGET_EXPANDER) Rexpander_set_expanded(sibling, R_FALSE);
+	}
+}
+
+/* A month picker made of buttons: a year with arrows over the twelve months. */
+static int g_mg_year = 2026, g_mg_month = 11;
+
+static void month_grid(const char* command) {
+	static const char* const months[12] = { "January", "February", "March", "April", "May", "June",
+		"July", "August", "September", "October", "November", "December" };
+	Rid grid = W("mg_months");
+	char text[64];
+	int i;
+	if (strcmp(command, "prev") == 0) g_mg_year--;
+	else if (strcmp(command, "next") == 0) g_mg_year++;
+	else if (starts_with(command, "month:")) g_mg_month = atoi(command + 6);
+	snprintf(text, sizeof(text), "%d", g_mg_year);
+	set_label("mg_year", text);
+	for (i = 0; grid != R_INVALID_ID && i < Rwidget_get_child_count(grid); i++) {
+		Rbutton_set_style(Rwidget_get_child(grid, i), i + 1 == g_mg_month ? R_BUTTON_PRIMARY : R_BUTTON_FLAT);
+	}
+	snprintf(text, sizeof(text), "Chosen: %s %d", months[g_mg_month - 1], g_mg_year);
+	set_label("mg_status", text);
+	if (starts_with(command, "month:")) {
+		Rid picker = W("jump_picker");
+		if (picker != R_INVALID_ID) Rdate_picker_set_date(picker, g_mg_year, g_mg_month, 1);
+	}
+}
+
 /* Every action that has no function of its own. */
 static void on_any(Rid sender, const char* action, void* user_data) {
 	(void)user_data;
 	if (starts_with(action, "say:")) {
 		app_toast(action + 4, R_TOAST_INFO);
+	} else if (starts_with(action, "neo:")) {
+		neo_open(atoi(action + 4));
+	} else if (strcmp(action, "accordion.exclusive") == 0) {
+		accordion_exclusive(sender);
+	} else if (starts_with(action, "mg.")) {
+		month_grid(action + 3);
 	} else if (starts_with(action, "go:")) {
 		nav_go(action + 3);
 	} else if (starts_with(action, "popover:")) {
@@ -637,7 +896,7 @@ void demos_init(void) {
 		"modal.open.edge", "modal.open.hairline", "modal.done" };
 	static const char* const toasts[] = { "toast.info", "toast.success", "toast.warning", "toast.error", "toast.action", "toast.burst", "toast.queue", "toast.clear" };
 	static const char* const values[] = {
-		"date.changed", "time.changed", "rating.changed", "page.changed", "color.changed", "slider.changed", "text.commit",
+		"date.changed", "date.jump", "time.changed", "rating.changed", "page.changed", "color.changed", "slider.changed", "text.commit",
 		"table.striped", "table.grid", "table.header", "tree.multi", "crumbs.push", "crumbs.reset"
 	};
 	size_t i;
@@ -659,14 +918,16 @@ void demos_init(void) {
 	{
 		static const char* const finder[] = { "finder.open", "finder.open:images", "finder.open:documents", "finder.open:multi",
 			"finder.open:folder", "finder.save", "finder.reveal", "finder.home", "finder.downloads" };
-		static const char* const notify[] = { "notify.simple", "notify.rich", "notify.delayed", "notify.raven",
-			"notify.badge", "notify.badge.clear", "notify.attention" };
+		static const char* const notify[] = { "notify.simple", "notify.rich", "notify.delayed",
+			"notify.badge", "notify.badge.clear", "notify.attention", "notify.settings" };
 		for (i = 0; i < sizeof(finder) / sizeof(finder[0]); i++) Raction_bind(finder[i], on_finder, NULL);
 		for (i = 0; i < sizeof(notify) / sizeof(notify[0]); i++) Raction_bind(notify[i], on_notify, NULL);
 	}
 	Raction_bind("nav.back", on_history, NULL);
 	Raction_bind("nav.forward", on_history, NULL);
 	Raction_bind("textarea.changed", on_textarea, NULL);
+	app_add_event_hook(input_fix_hook);
+	app_add_event_hook(dock_resize_hook);
 	app_add_event_hook(noanim_hook);
 	app_add_event_hook(history_hook);
 	Raction_set_default_handler(on_any, NULL);

@@ -93,7 +93,6 @@ static int matches(const OmniItem* item, const char* query) {
 
 static void filter(Omni* omni, const char* query) {
 	Rid list = Rwidget_find(g_window, omni->list);
-	char text[160];
 	int pass, i;
 	if (list == R_INVALID_ID) return;
 	if (!query) query = "";
@@ -107,14 +106,16 @@ static void filter(Omni* omni, const char* query) {
 			omni->results[omni->count++] = i;
 		}
 	}
-	Rlist_view_clear_items(list);
-	for (i = 0; i < omni->count; i++) {
-		const OmniItem* item = &g_items[omni->results[i]];
-		snprintf(text, sizeof(text), item->page ? "%s      %s" : "> %s      %s", item->label, item->detail);
-		Rlist_view_add_item(list, text);
+	{
+		const char* titles[MAX_ITEMS];
+		const char* details[MAX_ITEMS];
+		for (i = 0; i < omni->count; i++) {
+			titles[i] = g_items[omni->results[i]].label;
+			details[i] = g_items[omni->results[i]].detail;
+		}
+		roundlist_set_items(list, omni->count, titles, details);
 	}
-	if (omni->count == 0) Rlist_view_add_item(list, "No results");
-	Rlist_view_set_selected(list, omni->count > 0 ? 0 : -1);
+	roundlist_set_selected(list, omni->count > 0 ? 0 : -1);
 }
 
 static void close_palette(void) {
@@ -144,7 +145,7 @@ void omnibar_toggle(void) {
 static void run(Omni* omni) {
 	Rid list = Rwidget_find(g_window, omni->list);
 	Rid input = Rwidget_find(g_window, omni->input);
-	int index = list != R_INVALID_ID ? Rlist_view_get_selected(list) : -1;
+	int index = list != R_INVALID_ID ? roundlist_get_selected(list) : -1;
 	const OmniItem* item;
 	if (index < 0 || index >= omni->count) return;
 	item = &g_items[omni->results[index]];
@@ -170,22 +171,14 @@ static void on_activated(Rid list, int index, void* user_data) {
 	run((Omni*)user_data);
 }
 
-/* A single click runs the row, as in Spotlight. */
-static int on_list_event(Rid list, const REvent* event, void* user_data) {
-	(void)list;
-	if (event->type == R_EVENT_MOUSE_UP && event->button == R_MOUSE_LEFT) run((Omni*)user_data);
-	return R_FALSE;
-}
-
 static void move_selection(Omni* omni, int step) {
 	Rid list = Rwidget_find(g_window, omni->list);
 	int index;
 	if (list == R_INVALID_ID || omni->count == 0) return;
-	index = Rlist_view_get_selected(list) + step;
+	index = roundlist_get_selected(list) + step;
 	if (index < 0) index = omni->count - 1;
 	if (index >= omni->count) index = 0;
-	Rlist_view_set_selected(list, index);
-	Rlist_view_scroll_to_item(list, index);
+	roundlist_set_selected(list, index);
 }
 
 static int inside(const char* name, float x, float y) {
@@ -196,6 +189,8 @@ static int inside(const char* name, float x, float y) {
 	return x >= rx && y >= ry && x < rx + rw && y < ry + rh;
 }
 
+static int omni_key(Omni* omni, RKey key);
+
 static int omni_hook(const REvent* event) {
 	Omni* omni = NULL;
 	if (event->type == R_EVENT_MOUSE_DOWN && palette_open() && !inside("omni", event->x, event->y)) {
@@ -203,12 +198,28 @@ static int omni_hook(const REvent* event) {
 		return R_TRUE; /* as a modal: the click only closes */
 	}
 	if (event->type != R_EVENT_KEY_DOWN) return R_FALSE;
-	if (Rwidget_is_focused(Rwidget_find(g_window, g_palette.input))) omni = &g_palette;
-	else if (Rwidget_is_focused(Rwidget_find(g_window, g_inline.input))) omni = &g_inline;
+	/* the palette is modal: its keys, wherever the focus is */
+	if (palette_open()) omni = &g_palette;
+	else if (Rwidget_is_focused(Rwidget_find(g_window, g_inline.input)) || Rwidget_is_focused(Rwidget_find(g_window, g_inline.list))) omni = &g_inline;
 	if (!omni) return R_FALSE;
-	switch (event->key) {
+	return omni_key(omni, event->key);
+}
+
+static int on_input_event(Rid input, const REvent* event, void* user_data) {
+	(void)input;
+	/* the same keys, seen by the input itself (the window hook normally takes them first) */
+	if (event->type != R_EVENT_KEY_DOWN) return R_FALSE;
+	return omni_key((Omni*)user_data, event->key);
+}
+
+static int omni_key(Omni* omni, RKey key) {
+	switch (key) {
 	case R_KEY_UP: move_selection(omni, -1); return R_TRUE;
 	case R_KEY_DOWN: move_selection(omni, 1); return R_TRUE;
+	case R_KEY_ENTER:
+	case R_KEY_KP_ENTER:
+		run(omni);
+		return R_TRUE;
 	case R_KEY_ESCAPE:
 		if (omni->palette) close_palette();
 		else Rtext_input_set_text(Rwidget_find(g_window, omni->input), "");
@@ -231,8 +242,8 @@ static void bind(Omni* omni) {
 	if (input == R_INVALID_ID || list == R_INVALID_ID) return;
 	Rtext_input_set_changed_callback(input, on_changed, omni);
 	Rtext_input_set_committed_callback(input, on_committed, omni);
-	Rlist_view_set_activated_callback(list, on_activated, omni);
-	Rwidget_set_event_callback(list, on_list_event, omni);
+	Rwidget_set_event_callback(input, on_input_event, omni);
+	roundlist_set_activate_callback(list, on_activated, omni);
 	filter(omni, Rtext_input_get_text(input));
 }
 

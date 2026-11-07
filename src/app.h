@@ -36,6 +36,41 @@ const char* nav_entry_section(int index);
 void nav_back(void);
 void nav_forward(void);
 
+/* modal.c: a modal laid over the window, without Raven's dialog frame */
+void app_modal_init(void);
+int app_modal_open(const char* path);
+void app_modal_close(void);
+int app_modal_is_open(void);
+int app_modal_contains(Rid widget);
+
+/* tooltip.c: tooltips at the pointer (Raven's own are cleared) */
+void tooltip_init(void);
+void tooltip_scan(void);
+
+/* native_macos.m: System Settings, Notifications, for this app */
+int native_open_notification_settings(void);
+
+/* native_macos.m: an HTTP request, on a thread of the system; the answer comes on the UI
+ * thread. JSON only: `body` is the answer pretty-printed, or NULL with `error` set. */
+typedef void (*NativeHttpCallback)(int status, double ms, const char* headers, const char* body, const char* error, void* user_data);
+int native_http(const char* method, const char* url, const char* const* names, const char* const* values, int count,
+	const char* body, NativeHttpCallback callback, void* user_data);
+
+/* vlist.c, canvas_demo.c, http.c: pages of the custom section */
+void vlist_init(void);
+void vlist_bind_widgets(void);
+void canvas_demo_register(void);
+void http_init(void);
+void http_bind_widgets(void);
+
+/* roundlist.c: <RoundList>, rows with rounded corners (the omni bar) */
+typedef void (*RoundListCallback)(Rid list, int index, void* user_data);
+void roundlist_register(void);
+void roundlist_set_items(Rid list, int count, const char* const* titles, const char* const* details);
+int roundlist_get_selected(Rid list);
+void roundlist_set_selected(Rid list, int index);
+void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void* user_data);
+
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);
 
@@ -113,6 +148,41 @@ const char* nav_entry_title(int index);
 const char* nav_entry_section(int index);
 void nav_back(void);
 void nav_forward(void);
+
+/* modal.c: a modal laid over the window, without Raven's dialog frame */
+void app_modal_init(void);
+int app_modal_open(const char* path);
+void app_modal_close(void);
+int app_modal_is_open(void);
+int app_modal_contains(Rid widget);
+
+/* tooltip.c: tooltips at the pointer (Raven's own are cleared) */
+void tooltip_init(void);
+void tooltip_scan(void);
+
+/* native_macos.m: System Settings, Notifications, for this app */
+int native_open_notification_settings(void);
+
+/* native_macos.m: an HTTP request, on a thread of the system; the answer comes on the UI
+ * thread. JSON only: `body` is the answer pretty-printed, or NULL with `error` set. */
+typedef void (*NativeHttpCallback)(int status, double ms, const char* headers, const char* body, const char* error, void* user_data);
+int native_http(const char* method, const char* url, const char* const* names, const char* const* values, int count,
+	const char* body, NativeHttpCallback callback, void* user_data);
+
+/* vlist.c, canvas_demo.c, http.c: pages of the custom section */
+void vlist_init(void);
+void vlist_bind_widgets(void);
+void canvas_demo_register(void);
+void http_init(void);
+void http_bind_widgets(void);
+
+/* roundlist.c: <RoundList>, rows with rounded corners (the omni bar) */
+typedef void (*RoundListCallback)(Rid list, int index, void* user_data);
+void roundlist_register(void);
+void roundlist_set_items(Rid list, int count, const char* const* titles, const char* const* details);
+int roundlist_get_selected(Rid list);
+void roundlist_set_selected(Rid list, int index);
+void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void* user_data);
 
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);

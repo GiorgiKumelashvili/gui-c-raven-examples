@@ -9,4 +9,26 @@
 			<Label Name="date_status" Text="Pick a date" Opacity="0.6"/>
 		</VBox>
 	</Demo>
+	<Demo Title="Choosing the month and the year" Note="Raven's calendar has no month or year view: its arrows step a month, Page Up / Page Down step a month, Shift + Page Up / Down a year. To jump far, put a month and a year beside it (demos.c keeps the three in step).">
+		<HBox Spacing="10">
+			<ComboBox Name="jump_month" Items="January|February|March|April|May|June|July|August|September|October|November|December" Selected="10" Width="150" OnChanged="date.jump"/>
+			<SpinBox Name="jump_year" Min="1900" Max="2100" Value="2026" Decimals="0" Width="110" OnChanged="date.jump"/>
+			<DatePicker Name="jump_picker" Date="2026-11-07" Format="D MMMM YYYY" Width="200" OnChanged="date.changed"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Month picker (custom)" Note="A year with arrows over the twelve months, made of buttons. Choosing a month also moves the picker above.">
+		<VBox Spacing="10" Width="320" Slot.HAlign="Left">
+			<HBox Spacing="6">
+				<Button Style="Flat" OnClicked="mg.prev" Tooltip="Previous year"><Image Source="../icons/chevron-left.svg" Width="14" Height="14" TintText="true"/></Button>
+				<Label Name="mg_year" Text="2026" TextSize="17" TextAlign="Center" Slot.Fill="1" Slot.VAlign="Center"/>
+				<Button Style="Flat" OnClicked="mg.next" Tooltip="Next year"><Image Source="../icons/chevron-right.svg" Width="14" Height="14" TintText="true"/></Button>
+			</HBox>
+			<UniformGrid Name="mg_months" Columns="4" Spacing="6">
+				<ForEach Items="Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec" Var="m" Index="n">
+					<Button Text="{m}" Style="{n == 10 ? 'Primary' : 'Flat'}" OnClicked="mg.month:{n + 1}"/>
+				</ForEach>
+			</UniformGrid>
+			<Label Name="mg_status" Text="Chosen: November 2026" Opacity="0.6"/>
+		</VBox>
+	</Demo>
 </Page>

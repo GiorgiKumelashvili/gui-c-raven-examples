@@ -165,6 +165,11 @@
 						<Include Source="pages/custom.notify.xml"/>
 						<Include Source="pages/custom.omnibar.xml"/>
 						<Include Source="pages/custom.textarea.xml"/>
+						<Include Source="pages/custom.virtual.xml"/>
+						<Include Source="pages/custom.canvas.xml"/>
+						<Include Source="pages/custom.accordion.xml"/>
+						<Include Source="pages/custom.http.xml"/>
+						<Include Source="pages/custom.scrollspeed.xml"/>
 						<Include Source="pages/custom.datatable.xml"/>
 						<Include Source="pages/custom.buttongroup.xml"/>
 						<Include Source="pages/custom.segmented.xml"/>
@@ -179,6 +184,10 @@
 		<Canvas Name="popover_layer">
 			<!-- where a dragged row of a ListView or a Table lands (reorder.c) -->
 			<Border Name="drop_line" Visibility="Collapsed" Background="#0A84FF" CornerRadius="2"/>
+			<!-- the tooltip, at the pointer (tooltip.c) -->
+			<Border Name="app_tooltip" Visibility="Collapsed" Padding="9,5" CornerRadius="6" Shadow="10,0,3" HitTestable="false" Appear="Fade">
+				<Label Name="app_tooltip_text" TextSize="12"/>
+			</Border>
 			<Border Name="popover" Visibility="Collapsed" Width="290" Padding="16" CornerRadius="12" BorderWidth="1" Shadow="28,0,10" Appear="Pop">
 				<VBox>
 					<VBox Name="share" Spacing="10">
@@ -225,14 +234,19 @@
 
 		<!-- the command palette (custom, omnibar.c): Cmd+K -->
 		<Border Name="omni_scrim" Visibility="Collapsed" Background="#00000059" CornerRadius="0" Appear="Fade"/>
-		<Border Name="omni" Visibility="Collapsed" Width="620" Padding="10" CornerRadius="14" BorderWidth="1" Shadow="44,0,18" Appear="Zoom"
+		<Border Name="omni" Visibility="Collapsed" Width="620" Padding="12,16,12,14" CornerRadius="14" BorderWidth="1" Shadow="44,0,18" Appear="Zoom"
 			Slot.HAlign="Center" Slot.VAlign="Top" Slot.Padding="0,90,0,0">
-			<VBox Spacing="8">
-				<TextInput Name="omni_input" Placeholder="Search pages and commands..." Metric.ControlHeight="38" Metric.FontSize="16"/>
-				<ListView Name="omni_list" Height="330"/>
+			<VBox Spacing="12">
+				<!-- Color.Focus transparent: no focus ring -->
+				<TextInput Name="omni_input" Placeholder="Search pages and commands..." Metric.ControlHeight="38" Metric.FontSize="16" Color.Focus="transparent"/>
+				<OmniList List="omni_list" Height="340"/>
 				<Label Text="Up / Down to move  -  Enter to open  -  Esc to close" TextSize="11" Opacity="0.5" Slot.HAlign="Center"/>
 			</VBox>
 		</Border>
+
+		<!-- the app's own modal (modal.c): the content as it is, without Raven's dialog frame -->
+		<Border Name="modal_scrim" Visibility="Collapsed" Background="#00000070" CornerRadius="0" Appear="Fade"/>
+		<VBox Name="modal_host" Visibility="Collapsed" Slot.HAlign="Center" Slot.VAlign="Center" Appear="Pop"/>
 
 		<Toast Name="toast" Queue="Stack" MaxVisible="3" Slot.HAlign="Center" Slot.VAlign="Bottom" Slot.Padding="24"/>
 	</Overlay>

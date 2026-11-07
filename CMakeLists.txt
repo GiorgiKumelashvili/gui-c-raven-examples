@@ -19,6 +19,12 @@ set(APP_SOURCES
 	src/segmented.c
 	src/reorder.c
 	src/omnibar.c
+	src/modal.c
+	src/tooltip.c
+	src/vlist.c
+	src/canvas_demo.c
+	src/http.c
+	src/roundlist.c
 	src/selftest.c
 )
 

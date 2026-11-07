@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.http" Kind="Custom" Title="Simple HTTP" Subtitle="A request with a method, a URL, headers and a body; the answer must be JSON (anything else is refused), shown pretty-printed with its status, time and headers. The request goes through NSURLSession (src/native_macos.m) on a thread of the system and comes back to the UI thread; the page is src/http.c.">
+	<Demo Title="Request">
+		<HBox Spacing="8">
+			<Label Text="Example" Opacity="0.6" Slot.VAlign="Center"/>
+			<ComboBox Name="http_preset" Width="300" OnChanged="http.preset"/>
+		</HBox>
+		<HBox Spacing="8">
+			<ComboBox Name="http_method" Items="GET|POST|PUT|PATCH|DELETE" Selected="0" Width="110" OnChanged="http.method"/>
+			<TextInput Name="http_url" Placeholder="https://api.example.com/items" Slot.Fill="1"/>
+			<Button Name="http_send" Text="Send" Style="Primary" OnClicked="http.send" Tooltip="Send (or Enter in the URL)"/>
+		</HBox>
+		<TabView Height="250">
+			<VBox Slot.Title="Headers" Spacing="8" Slot.Padding="10">
+				<ScrollBox Slot.Fill="1">
+					<VBox Name="http_headers" Spacing="6"/>
+				</ScrollBox>
+				<Button Text="Add header" Style="Flat" Slot.HAlign="Left" OnClicked="http.header.add"/>
+			</VBox>
+			<VBox Slot.Title="Body" Spacing="6" Slot.Padding="10">
+				<TextEditor Name="http_req_body" Language="JSON" LineNumbers="true" Slot.Fill="1"/>
+				<Label Name="http_body_note" TextSize="11" Opacity="0.55"/>
+			</VBox>
+		</TabView>
+	</Demo>
+	<Demo Title="Response">
+		<HBox Spacing="12">
+			<Label Name="http_status" Text="No request yet" TextSize="16" Slot.VAlign="Center"/>
+			<Label Name="http_meta" Opacity="0.6" Slot.VAlign="Center"/>
+		</HBox>
+		<TabView Height="380">
+			<TextEditor Name="http_resp_body" Slot.Title="Body (JSON)" Language="JSON" ReadOnly="true" LineNumbers="true"/>
+			<TextEditor Name="http_resp_headers" Slot.Title="Headers" ReadOnly="true" LineNumbers="false"/>
+		</TabView>
+	</Demo>
+</Page>

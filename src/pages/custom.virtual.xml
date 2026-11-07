@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.virtual" Kind="Custom" Title="Virtual list (1M rows)" Subtitle="Raven's ListView and Table in virtual mode: they store nothing and ask for the text of the rows they draw, so a million rows cost what the visible ones cost. src/vlist.c computes each row from its number and keeps only an array of indices for the filter and the sort. Scroll fast, filter, click the table headers to sort.">
+	<Demo Title="Performance">
+		<HBox Spacing="10">
+			<ComboBox Name="vl_count_combo" Items="10 000 rows|100 000 rows|1 000 000 rows" Selected="1" Width="170" OnChanged="vl.count"/>
+			<TextInput Name="vl_filter" Placeholder="Filter: a name, a city, a number..." Slot.Fill="1"/>
+			<Button Text="Jump to a random row" OnClicked="vl.jump"/>
+		</HBox>
+		<Label Name="vl_stats" Text="..." Font="monospace" TextSize="12" Opacity="0.7"/>
+		<HBox Spacing="12" Height="460">
+			<VBox Spacing="6" Slot.Fill="2">
+				<Label Text="ListView" Opacity="0.6" TextSize="12"/>
+				<ListView Name="vl_list" Slot.Fill="1"/>
+			</VBox>
+			<VBox Spacing="6" Slot.Fill="3">
+				<Label Text="Table (sortable)" Opacity="0.6" TextSize="12"/>
+				<Table Name="vl_table" Striped="true" Slot.Fill="1">
+					<Column Header="#" Width="90" Align="Right"/>
+					<Column Header="Name" Width="190"/>
+					<Column Header="City" Width="120"/>
+					<Column Header="Score" Fill="1" Align="Right"/>
+				</Table>
+			</VBox>
+		</HBox>
+	</Demo>
+</Page>

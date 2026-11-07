@@ -5,7 +5,11 @@
 			<Button Text="Simple" Style="Primary" OnClicked="notify.simple"/>
 			<Button Text="Subtitle and sound" OnClicked="notify.rich"/>
 			<Button Text="In 5 seconds" OnClicked="notify.delayed"/>
-			<Button Text="Raven's Rnotification_show" Style="Flat" OnClicked="notify.raven"/>
+		</HBox>
+		<HBox Spacing="10">
+			<Button Text="Notification settings..." OnClicked="notify.settings" Tooltip="Opens System Settings, Notifications, Raven Components"/>
+			<Label Wrap="true" Opacity="0.6" TextSize="12" Slot.Fill="1" Slot.VAlign="Center"
+				Text="If macOS answered Don't Allow once, it will not ask again: turn Allow notifications on there (and choose Banners)."/>
 		</HBox>
 	</Demo>
 	<Demo Title="The Dock" Note="NSDockTile: a badge on the icon; requestUserAttention bounces it while the app is not in front.">

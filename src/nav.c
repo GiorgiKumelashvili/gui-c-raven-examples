@@ -53,6 +53,9 @@ static const NavEntry k_custom[] = {
 	{ "custom.buttongroup", "Button group" }, { "custom.segmented", "Segmented control" },
 	{ "custom.popover", "Popover" }, { "custom.omnibar", "Omni bar" },
 	{ "custom.fileinput", "File input" }, { "custom.textarea", "Plain textarea" },
+	{ "custom.virtual", "Virtual list (1M rows)" }, { "custom.canvas", "Canvas" },
+	{ "custom.accordion", "Accordion" }, { "custom.http", "Simple HTTP" },
+	{ "custom.scrollspeed", "Scroll speeds" },
 };
 
 static const NavSection k_sections[] = {

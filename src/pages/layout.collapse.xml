@@ -9,6 +9,18 @@
 [09:41:10] Build succeeded in 8.2 s]]></Label>
 		</Border>
 	</Demo>
+	<Demo Title="Without animation" Note="Class=&quot;noanim&quot; (demos.c turns Raven's animations off while it is clicked); the region has no Appear transition.">
+		<HBox Spacing="10">
+			<Button Text="Show build logs (instant)" Class="noanim" Slot.HAlign="Left" OnClicked="toggle:build_logs_instant"/>
+		</HBox>
+		<Border Name="build_logs_instant" Visibility="Collapsed" Padding="12" CornerRadius="8" BorderWidth="1">
+			<Label Font="monospace" TextSize="12" Wrap="true"><![CDATA[[09:41:02] Resolving dependencies...
+[09:41:10] Build succeeded in 8.2 s]]></Label>
+		</Border>
+		<Expander Title="Instant expander" Class="noanim">
+			<Label Wrap="true" Opacity="0.8" Text="Opens and closes at once, without sliding."/>
+		</Expander>
+	</Demo>
 	<Demo Title="Expander" Note="Expanded sets the first state; OnChanged fires when it opens or closes.">
 		<VBox Spacing="6">
 			<Expander Title="What is Raven?" Expanded="true">

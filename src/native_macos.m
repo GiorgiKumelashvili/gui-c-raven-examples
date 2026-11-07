@@ -152,13 +152,23 @@ static NSString* applescript_quote(NSString* text) {
 	return [[text stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
 }
 
-/* Works for any process, but the notification is shown as coming from Script Editor. */
+/* Works for any process, but the notification is shown as coming from Script Editor, with the
+ * settings of Script Editor (its sound may be off): the sound is played here instead. */
 static BOOL notify_applescript(NSString* title, NSString* subtitle, NSString* body, BOOL sound) {
-	NSString* source = [NSString stringWithFormat:@"display notification \"%@\" with title \"%@\" subtitle \"%@\"%@",
-		applescript_quote(body), applescript_quote(title), applescript_quote(subtitle), sound ? @" sound name \"Glass\"" : @""];
+	NSString* source = subtitle.length
+		? [NSString stringWithFormat:@"display notification \"%@\" with title \"%@\" subtitle \"%@\"",
+			applescript_quote(body), applescript_quote(title), applescript_quote(subtitle)]
+		: [NSString stringWithFormat:@"display notification \"%@\" with title \"%@\"", applescript_quote(body), applescript_quote(title)];
 	NSDictionary* error = nil;
 	[[[NSAppleScript alloc] initWithSource:source] executeAndReturnError:&error];
+	if (sound) [[NSSound soundNamed:@"Glass"] play];
 	return error == nil;
+}
+
+int native_open_notification_settings(void) {
+	NSString* id_ = NSBundle.mainBundle.bundleIdentifier ?: @"";
+	NSURL* url = [NSURL URLWithString:[@"x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=" stringByAppendingString:id_]];
+	return [[NSWorkspace sharedWorkspace] openURL:url] ? R_TRUE : R_FALSE;
 }
 
 int native_notify(const char* title, const char* subtitle, const char* body, int sound, double delay,
@@ -188,11 +198,12 @@ int native_notify(const char* title, const char* subtitle, const char* body, int
 		UNNotificationRequest* request;
 		UNTimeIntervalNotificationTrigger* trigger = nil;
 		if (!granted) {
-			NSString* reason = error ? error.localizedDescription : @"not allowed in System Settings, Notifications";
+			NSString* reason = @"they are turned off for Raven Components: System Settings, Notifications (button below)";
+			(void)error;
 			dispatch_async(dispatch_get_main_queue(), ^{
 				BOOL ok = notify_applescript(ns_title, ns_subtitle, ns_body, sound != 0);
-				notify_report(callback, user_data, [NSString stringWithFormat:@"Notification Center refused (%@)%@", reason,
-					ok ? @"; shown with AppleScript instead" : @""]);
+				notify_report(callback, user_data, [NSString stringWithFormat:@"Notification Center refused: %@.%@", reason,
+					ok ? @" Shown through AppleScript meanwhile (as Script Editor, with its own settings)." : @""]);
 			});
 			Rwake_up();
 			return;
@@ -220,5 +231,105 @@ int native_dock_badge(const char* text) {
 int native_request_attention(void) {
 	/* bounces the Dock icon, only while the app is not the active one */
 	[NSApp requestUserAttention:NSInformationalRequest];
+	return R_TRUE;
+}
+
+/* ---------------------------------------------------------------------------
+ *  HTTP (NSURLSession), JSON answers only
+ * ------------------------------------------------------------------------- */
+
+typedef struct HttpResult {
+	NativeHttpCallback callback;
+	void* user_data;
+	int status;
+	double ms;
+	char* headers;
+	char* body;
+	char* error;
+} HttpResult;
+
+static void http_on_ui(void* data) {
+	HttpResult* r = (HttpResult*)data;
+	r->callback(r->status, r->ms, r->headers, r->body, r->error, r->user_data);
+	free(r->headers);
+	free(r->body);
+	free(r->error);
+	free(r);
+}
+
+static char* dup_ns(NSString* text) {
+	return text ? strdup(text.UTF8String ?: "") : NULL;
+}
+
+int native_http(const char* method, const char* url, const char* const* names, const char* const* values, int count,
+	const char* body, NativeHttpCallback callback, void* user_data) {
+	NSURL* ns_url = [NSURL URLWithString:[ns_string(url) stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet]];
+	NSMutableURLRequest* request;
+	NSString* verb = ns_string(method).uppercaseString;
+	BOOL has_accept = NO;
+	CFAbsoluteTime start;
+	int i;
+
+	if (!ns_url || !ns_url.scheme || !ns_url.host) {
+		HttpResult* r = (HttpResult*)calloc(1, sizeof(HttpResult));
+		r->callback = callback;
+		r->user_data = user_data;
+		r->error = strdup("Not a valid URL: it needs a scheme and a host (https://example.com/...)");
+		Rtask_post(http_on_ui, r);
+		return R_TRUE;
+	}
+	request = [NSMutableURLRequest requestWithURL:ns_url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0];
+	request.HTTPMethod = verb;
+	for (i = 0; i < count; i++) {
+		NSString* name = ns_string(names[i]);
+		if (!name.length) continue;
+		if ([name caseInsensitiveCompare:@"Accept"] == NSOrderedSame) has_accept = YES;
+		[request setValue:ns_string(values[i]) forHTTPHeaderField:name];
+	}
+	if (!has_accept) [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+	if (body && body[0] && ![verb isEqualToString:@"GET"] && ![verb isEqualToString:@"HEAD"]) {
+		request.HTTPBody = [ns_string(body) dataUsingEncoding:NSUTF8StringEncoding];
+	}
+
+	start = CFAbsoluteTimeGetCurrent();
+	[[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
+		HttpResult* r = (HttpResult*)calloc(1, sizeof(HttpResult));
+		NSHTTPURLResponse* http = [response isKindOfClass:[NSHTTPURLResponse class]] ? (NSHTTPURLResponse*)response : nil;
+		r->callback = callback;
+		r->user_data = user_data;
+		r->ms = (CFAbsoluteTimeGetCurrent() - start) * 1000.0;
+		if (error) {
+			r->error = dup_ns(error.localizedDescription);
+		} else {
+			NSMutableString* headers = [NSMutableString string];
+			NSString* type = @"";
+			r->status = (int)http.statusCode;
+			for (NSString* key in [http.allHeaderFields.allKeys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]) {
+				[headers appendFormat:@"%@: %@\n", key, http.allHeaderFields[key]];
+				if ([key caseInsensitiveCompare:@"Content-Type"] == NSOrderedSame) type = http.allHeaderFields[key];
+			}
+			r->headers = dup_ns(headers);
+			if (data.length == 0) {
+				r->body = strdup("");
+			} else if ([type rangeOfString:@"json" options:NSCaseInsensitiveSearch].location == NSNotFound) {
+				/* JSON only: anything else is refused, with a glimpse of what came */
+				NSString* raw = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(0, MIN(data.length, (NSUInteger)400))] encoding:NSUTF8StringEncoding];
+				r->error = dup_ns([NSString stringWithFormat:@"Refused: the answer is not JSON (Content-Type: %@).\n\n%@%@",
+					type.length ? type : @"none", raw ?: @"(binary)", data.length > 400 ? @"\n..." : @""]);
+			} else {
+				NSError* parse_error = nil;
+				id json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingFragmentsAllowed error:&parse_error];
+				if (!json) {
+					r->error = dup_ns([NSString stringWithFormat:@"The answer says JSON but does not parse: %@", parse_error.localizedDescription]);
+				} else {
+					NSJSONWritingOptions options = NSJSONWritingPrettyPrinted | NSJSONWritingSortedKeys | NSJSONWritingFragmentsAllowed;
+					if (@available(macOS 10.15, *)) options |= NSJSONWritingWithoutEscapingSlashes;
+					r->body = dup_ns([[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:json options:options error:nil]
+						encoding:NSUTF8StringEncoding]);
+				}
+			}
+		}
+		Rtask_post(http_on_ui, r);
+	}] resume];
 	return R_TRUE;
 }

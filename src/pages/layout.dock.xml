@@ -19,4 +19,81 @@
 			<Label Name="dock_assets" Slot.Title="Assets" Slot.Dock="Tab" Slot.DockTo="dock_log" Text="12 textures, 4 meshes" Slot.Padding="8"/>
 		</DockArea>
 	</Demo>
+	<Demo Title="Console over the content" Note="The console is not docked: it floats over the whole area (an Overlay), with a shadow, and closes with its button. The toolbar brings it back.">
+		<HBox Spacing="8">
+			<Button Text="Toggle console" OnClicked="toggle:overlay_console"/>
+		</HBox>
+		<Overlay Height="380">
+			<DockArea>
+				<Border Name="dock2_scene" Slot.Title="Viewport" Background="#8E4EC620"><Label Text="Viewport" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+				<TreeView Name="dock2_outliner" Slot.Title="Layers" Slot.Dock="Left" Slot.DockSize="0.24">
+					<Item Text="Background"/>
+					<Item Text="Shapes" Expanded="true">
+						<Item Text="Circle"/>
+						<Item Text="Square"/>
+					</Item>
+					<Item Text="Text"/>
+				</TreeView>
+			</DockArea>
+			<Border Name="overlay_console" Slot.VAlign="Bottom" Slot.Padding="10" Height="150" Padding="0" CornerRadius="10" BorderWidth="1" Shadow="28,0,8" Appear="FlyUp">
+				<VBox>
+					<HBox Spacing="6" Slot.Padding="12,6,6,6">
+						<Label Text="Console" TextSize="13" Slot.Fill="1" Slot.VAlign="Center"/>
+						<Button Text="Clear" Style="Flat" OnClicked="say:Console cleared"/>
+						<Button Style="Flat" OnClicked="hide:overlay_console" Tooltip="Close the console">
+							<Image Source="../icons/close.svg" Width="12" Height="12" TintText="true"/>
+						</Button>
+					</HBox>
+					<Separator/>
+					<Label Font="monospace" TextSize="12" Wrap="true" Opacity="0.85" Slot.Padding="12,8"><![CDATA[> render --frames 1-120
+  frame 120/120  done in 4.1 s
+> export viewport.png
+  saved 1920 x 1080]]></Label>
+				</VBox>
+			</Border>
+		</Overlay>
+	</Demo>
+	<Demo Title="Console across the whole width, over the content" Note="Like position: fixed on the web: the console is laid over the bottom of the area (an Overlay), as wide as it, in the color of the sidebar. Drag its top edge: it only grows up and down, and the panels under it do not move.">
+		<HBox Spacing="8">
+			<Button Text="Toggle terminal" OnClicked="toggle:dock4_console"/>
+		</HBox>
+		<Overlay Name="dock4_area" Height="440">
+			<DockArea>
+				<Border Name="dock4_editor" Slot.Title="main.c" Background="#3E63DD18"><Label Text="Editor: it keeps its size under the terminal" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+				<TreeView Name="dock4_files" Slot.Title="Files" Slot.Dock="Left" Slot.DockSize="0.24">
+					<Item Text="src" Expanded="true">
+						<Item Text="main.c"/>
+						<Item Text="http.c"/>
+						<Item Text="vlist.c"/>
+					</Item>
+				</TreeView>
+			</DockArea>
+			<!-- the Border paints the Panel color of the theme: the color of the sidebar -->
+			<Border Name="dock4_console" Slot.VAlign="Bottom" Height="160" Padding="0" CornerRadius="0" Shadow="18,0,-2">
+				<VBox>
+					<!-- the edge that is dragged (demos.c: dock_resize_hook) -->
+					<Border Name="dock4_grip" Height="8" Cursor="ResizeV" Background="#00000001" CornerRadius="0" Tooltip="Drag to resize">
+						<Border Width="40" Height="4" CornerRadius="2" Background="#8E8E9366" Slot.HAlign="Center" Slot.VAlign="Center"/>
+					</Border>
+					<HBox Spacing="6" Slot.Padding="12,0,6,4">
+						<Label Text="TERMINAL" TextSize="11" Opacity="0.6" Slot.Fill="1" Slot.VAlign="Center"/>
+						<Button Text="Clear" Style="Flat" OnClicked="say:Terminal cleared"/>
+						<Button Style="Flat" OnClicked="hide:dock4_console" Tooltip="Close the terminal">
+							<Image Source="../icons/close.svg" Width="11" Height="11" TintText="true"/>
+						</Button>
+					</HBox>
+					<Separator/>
+					<ScrollBox Slot.Fill="1">
+						<Label Font="monospace" TextSize="12" Wrap="true" Opacity="0.85" Slot.Padding="12,8"><![CDATA[$ cmake --build build
+[1/5] Building C object src/roundlist.c.o
+[2/5] Building C object src/http.c.o
+[3/5] Building OBJC object src/native_macos.m.o
+[4/5] Linking C executable raven_app.app/Contents/MacOS/raven_app
+[5/5] Signing raven_app.app ad hoc
+$ ./run.sh]]></Label>
+					</ScrollBox>
+				</VBox>
+			</Border>
+		</Overlay>
+	</Demo>
 </Page>

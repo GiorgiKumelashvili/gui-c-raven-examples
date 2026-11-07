@@ -4,7 +4,10 @@
 		<HBox Spacing="10">
 			<Button Text="Invite a teammate..." Style="Primary" OnClicked="modal.open.form"/>
 			<Button Text="Terms of service..." OnClicked="modal.open.terms"/>
-			<Button Text="No padding" OnClicked="modal.open.edge" Tooltip="Padding=&quot;0&quot;: the content touches the edges of the dialog"/>
+		</HBox>
+		<Label Wrap="true" Opacity="0.6" TextSize="12" Text="Rdialog_open always lays the content on Raven's own surface, with a margin around it. The two below use the app's modal instead (src/modal.c): the card is the whole modal."/>
+		<HBox Spacing="10">
+			<Button Text="No padding" OnClicked="modal.open.edge" Tooltip="Padding=&quot;0&quot;: the card is the whole modal, its picture touches the edges"/>
 			<Button Text="1px padding" OnClicked="modal.open.hairline" Tooltip="Padding=&quot;1&quot;: a hairline frame around an inner card"/>
 		</HBox>
 		<Label Name="modal_result" Text="No dialog closed yet." Opacity="0.6"/>

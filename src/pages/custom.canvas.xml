@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.canvas" Kind="Custom" Title="Canvas" Subtitle="Raven has no &lt;canvas&gt; element; its CUSTOM widget is one. A paint callback draws with Rdraw_rect, _circle, _line, _curve, _triangle, _text, _image and _glass, clipped, in logical units; Rdraw_spring animates. Raven also has a Canvas panel, which places widgets (not pixels) freely with anchors. src/canvas_demo.c makes the two tags below.">
+	<Demo Title="&lt;CanvasShowcase&gt;: every primitive, animated" Note="Move the pointer over it: the red disc follows on a wobbly spring.">
+		<CanvasShowcase Name="showcase"/>
+	</Demo>
+	<Demo Title="&lt;SketchPad&gt;: draw on it" Note="Mouse, trackpad or pen. The strokes are kept as points and drawn as lines with round caps.">
+		<HBox Spacing="8">
+			<ButtonGroup Gap="4">
+				<Button Text="Ink" Style="Flat" OnClicked="sketch.color:#1E1E28"/>
+				<Button Text="Red" Style="Flat" Color.Text="#E5484D" OnClicked="sketch.color:#E5484D"/>
+				<Button Text="Blue" Style="Flat" Color.Text="#3E63DD" OnClicked="sketch.color:#3E63DD"/>
+				<Button Text="Green" Style="Flat" Color.Text="#30A46C" OnClicked="sketch.color:#30A46C"/>
+				<Button Text="Orange" Style="Flat" Color.Text="#F76B15" OnClicked="sketch.color:#F76B15"/>
+				<Button Text="Violet" Style="Flat" Color.Text="#8E4EC6" OnClicked="sketch.color:#8E4EC6"/>
+			</ButtonGroup>
+			<Label Text="Width" Opacity="0.6" Slot.VAlign="Center"/>
+			<Slider Min="1" Max="16" Value="3" Width="130" OnChanged="sketch.width" Slot.VAlign="Center"/>
+			<Spacer Slot.Fill="1"/>
+			<Button Text="Undo" OnClicked="sketch.undo"/>
+			<Button Text="Clear" Style="Flat" OnClicked="sketch.clear"/>
+		</HBox>
+		<SketchPad/>
+	</Demo>
+	<Demo Title="The code" Note="A custom widget in C: measure, paint, events. Then Rxml_register_tag makes it a tag of the XML.">
+		<TextEditor Language="C" ReadOnly="true" LineNumbers="true" Height="520"><![CDATA[#include <Raven.h>
+
+typedef struct Dot { float x, y; int inside; RSpring sx, sy; } Dot;
+
+/* the size the widget asks for */
+static void measure(Rid w, float* width, float* height, void* user) {
+	*width = 400.0f;
+	*height = 300.0f;
+}
+
+/* called each time the widget is drawn: (0, 0) is its top-left corner */
+static void paint(Rid w, RPainter* p, float width, float height, void* user) {
+	Dot* d = user;
+	float t = (float)Rget_time();
+
+	Rdraw_rect(p, 0, 0, width, height, 12, 0.08f, 0.09f, 0.20f, 1);        /* x y w h radius rgba */
+	Rdraw_line(p, 0, height / 2, width, height / 2, 1, 1, 1, 1, 0.1f);    /* x0 y0 x1 y1 thickness rgba */
+	Rdraw_curve(p, 0, 200, 120, 200 - 60 * sinf(t), 280, 200 + 60 * cosf(t), width, 200,
+		3, 0.4f, 0.8f, 1, 1);                                              /* a cubic bezier */
+	Rdraw_triangle(p, 40, 40, 80, 40, 60, 75, 1, 0.4f, 0.4f, 1);
+	Rdraw_text(p, R_INVALID_ID, 14, 16, 12, "Hello, canvas", 1, 1, 1, 0.8f);
+
+	/* springs: the disc catches up with the pointer, overshoots, settles */
+	float x = Rdraw_spring(p, &d->sx, d->x, R_MOTION_WOBBLY);
+	float y = Rdraw_spring(p, &d->sy, d->y, R_MOTION_WOBBLY);
+	Rdraw_circle(p, x, y, 10, 1, 0.27f, 0.35f, 1);
+
+	Rwidget_invalidate(w);   /* draw again next frame: an animation */
+}
+
+static int event(Rid w, const REvent* e, void* user) {
+	Dot* d = user;
+	if (e->type == R_EVENT_MOUSE_MOVE) { d->x = e->local_x; d->y = e->local_y; }
+	return R_FALSE;          /* R_TRUE would consume it */
+}
+
+static Rid create(const char* tag, void* user) {
+	Rid w = Rwidget_create(R_WIDGET_CUSTOM);
+	Dot* d = calloc(1, sizeof(Dot));
+	Rcustom_set_measure_callback(w, measure, d);
+	Rcustom_set_paint_callback(w, paint, d);
+	Rwidget_set_event_callback(w, event, d);
+	return w;
+}
+
+/* before loading the XML: <MyCanvas Height="300"/> is now a tag */
+Rxml_register_tag("MyCanvas", create, NULL, NULL);
+]]></TextEditor>
+	</Demo>
+</Page>

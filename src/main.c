@@ -82,6 +82,9 @@ static void on_reload(const char* path, int ok, void* user_data) {
 	nav_init();
 	demos_bind_widgets();
 	omnibar_bind_widgets();
+	vlist_bind_widgets();
+	http_bind_widgets();
+	tooltip_scan();
 }
 
 int main(void) {
@@ -91,13 +94,22 @@ int main(void) {
 	Rerror_set_callback(on_error);
 	if (!Rinit_ex(&desc)) return 1;
 
+	/* documents given as text (header rows of the HTTP page) find their files in src/ */
+	Rxml_set_base_path(APP_UI_DIR);
+
 	/* the tags made in C must be known before the documents that use them */
 	datatable_register();
 	segmented_register();
+	canvas_demo_register();
+	roundlist_register();
+	vlist_init();
+	http_init();
 	demos_init();
 	popover_init();
 	reorder_init();
 	omnibar_init();
+	app_modal_init();
+	tooltip_init();
 
 	/* APP_THEME=MacOSLight: start with another look */
 	if (getenv("APP_THEME")) Rtheme_use(getenv("APP_THEME"));
@@ -113,6 +125,9 @@ int main(void) {
 	nav_init();
 	demos_bind_widgets();
 	omnibar_bind_widgets();
+	vlist_bind_widgets();
+	http_bind_widgets();
+	tooltip_scan();
 	/* APP_PAGE=custom.datatable ./build/raven_app opens on that page */
 	if (getenv("APP_PAGE")) nav_go(getenv("APP_PAGE"));
 
