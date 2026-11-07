@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Padding="0": the picture at the top touches the edges of the dialog. -->
+<Border Padding="0" CornerRadius="14" Width="440" Clip="true">
+	<VBox Spacing="0">
+		<Border Effect="mesh" CornerRadius="14,14,0,0" Height="150">
+			<VBox Spacing="2" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="20,16">
+				<Label Text="What's new" TextSize="13" Color="white" Opacity="0.85"/>
+				<Label Text="Raven 1.4" TextSize="26" Color="white"/>
+			</VBox>
+		</Border>
+		<VBox Spacing="14" Slot.Padding="20">
+			<Label Wrap="true" Opacity="0.8" Text="This dialog has no padding: its content goes to the edges, and only its corners are rounded (Clip=&quot;true&quot;). The text below the picture has its own padding."/>
+			<HBox Spacing="8" Slot.HAlign="Right">
+				<Button Text="Later" OnClicked="modal.cancel"/>
+				<Button Text="Got it" Style="Primary" OnClicked="modal.done"/>
+			</HBox>
+		</VBox>
+	</VBox>
+</Border>

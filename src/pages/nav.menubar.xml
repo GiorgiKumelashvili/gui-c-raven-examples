@@ -37,4 +37,30 @@
 			</VBox>
 		</Border>
 	</Demo>
+	<Demo Title="Without animation" Note="Class=&quot;noanim&quot;: menus open and close at once (demos.c turns Raven's animations off while it is used).">
+		<Border CornerRadius="8" BorderWidth="1" Padding="0">
+			<VBox>
+				<MenuBar Native="false" Class="noanim">
+					<Menu Text="File">
+						<MenuItem Text="New" OnClicked="menu.new"/>
+						<MenuItem Text="Open..." OnClicked="menu.open"/>
+						<Separator/>
+						<MenuItem Text="Export" OnClicked="menu.export"/>
+					</Menu>
+					<Menu Text="View">
+						<MenuItem Text="Zoom In" OnClicked="menu.zoomin"/>
+						<MenuItem Text="Zoom Out" OnClicked="menu.zoomout"/>
+						<Menu Text="Panels">
+							<MenuItem Text="Outliner" Checkable="true" Checked="true" OnClicked="menu.outliner"/>
+							<MenuItem Text="Inspector" Checkable="true" OnClicked="menu.inspector"/>
+						</Menu>
+					</Menu>
+					<Menu Text="Help">
+						<MenuItem Text="About" OnClicked="menu.about"/>
+					</Menu>
+				</MenuBar>
+				<Label Text="Instant menus" Opacity="0.5" Slot.Padding="16,40" Slot.HAlign="Center"/>
+			</VBox>
+		</Border>
+	</Demo>
 </Page>

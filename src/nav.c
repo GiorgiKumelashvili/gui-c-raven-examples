@@ -48,9 +48,11 @@ static const NavEntry k_overlays[] = {
 static const NavEntry k_text[] = { { "text.markdown", "Typography & Markdown" }, { "text.editor", "Code editor" } };
 static const NavEntry k_tools[] = { { "tools.nodes", "Node graph" }, { "tools.timeline", "Timeline" } };
 static const NavEntry k_custom[] = {
-	{ "custom.nativemenu", "macOS context menu" }, { "custom.datatable", "Data table" },
+	{ "custom.nativemenu", "macOS context menu" }, { "custom.finder", "Finder file panels" },
+	{ "custom.notify", "macOS notifications" }, { "custom.datatable", "Data table" },
 	{ "custom.buttongroup", "Button group" }, { "custom.segmented", "Segmented control" },
-	{ "custom.popover", "Popover" }, { "custom.fileinput", "File input" },
+	{ "custom.popover", "Popover" }, { "custom.omnibar", "Omni bar" },
+	{ "custom.fileinput", "File input" }, { "custom.textarea", "Plain textarea" },
 };
 
 static const NavSection k_sections[] = {
@@ -68,8 +70,15 @@ static const NavSection k_sections[] = {
 #define SECTION_COUNT ((int)(sizeof(k_sections) / sizeof(k_sections[0])))
 
 static Rid g_icons[SECTION_COUNT];
-static Rid g_page_icon;
 static const char* g_current = "home";
+
+/* history, as in a browser: back and forward */
+#define HISTORY_MAX 64
+static const char* g_back[HISTORY_MAX];
+static int g_back_count;
+static const char* g_forward[HISTORY_MAX];
+static int g_forward_count;
+static int g_in_history;
 static int g_rebuilding;
 static int g_laid_out;
 
@@ -98,6 +107,72 @@ static const NavEntry* find_entry(const char* id, const NavSection** section) {
 	return NULL;
 }
 
+int nav_entry_count(void) {
+	int s, n = 0;
+	for (s = 0; s < SECTION_COUNT; s++) n += k_sections[s].count;
+	return n;
+}
+
+static const NavEntry* entry_at(int index, const NavSection** section) {
+	int s;
+	for (s = 0; s < SECTION_COUNT; s++) {
+		if (index < k_sections[s].count) {
+			if (section) *section = &k_sections[s];
+			return &k_sections[s].entries[index];
+		}
+		index -= k_sections[s].count;
+	}
+	return NULL;
+}
+
+const char* nav_entry_id(int index) {
+	const NavEntry* entry = entry_at(index, NULL);
+	return entry ? entry->id : "";
+}
+
+const char* nav_entry_title(int index) {
+	const NavEntry* entry = entry_at(index, NULL);
+	return entry ? entry->title : "";
+}
+
+const char* nav_entry_section(int index) {
+	const NavSection* section = NULL;
+	return entry_at(index, &section) ? section->title : "";
+}
+
+static void push(const char** stack, int* count, const char* id) {
+	if (*count == HISTORY_MAX) {
+		memmove(stack, stack + 1, sizeof(char*) * (HISTORY_MAX - 1));
+		(*count)--;
+	}
+	stack[(*count)++] = id;
+}
+
+static void update_arrows(void) {
+	Rid back = Rwidget_find(g_window, "nav_back");
+	Rid forward = Rwidget_find(g_window, "nav_forward");
+	if (back != R_INVALID_ID) Rwidget_set_enabled(back, g_back_count > 0);
+	if (forward != R_INVALID_ID) Rwidget_set_enabled(forward, g_forward_count > 0);
+}
+
+void nav_back(void) {
+	if (g_back_count == 0) return;
+	push(g_forward, &g_forward_count, g_current);
+	g_in_history = 1;
+	nav_go(g_back[--g_back_count]);
+	g_in_history = 0;
+	update_arrows();
+}
+
+void nav_forward(void) {
+	if (g_forward_count == 0) return;
+	push(g_back, &g_back_count, g_current);
+	g_in_history = 1;
+	nav_go(g_forward[--g_forward_count]);
+	g_in_history = 0;
+	update_arrows();
+}
+
 static Rid find_tree_item(Rid tree, const char* id) {
 	int s, e;
 	for (s = 0; s < Rtree_view_get_item_count(tree); s++) {
@@ -121,6 +196,11 @@ void nav_go(const char* id) {
 	int i;
 
 	if (!entry || pages == R_INVALID_ID) return;
+	/* a new place: the one left goes to the history, the way forward is forgotten */
+	if (!g_in_history && strcmp(entry->id, g_current) != 0 && g_laid_out) {
+		push(g_back, &g_back_count, g_current);
+		g_forward_count = 0;
+	}
 	g_current = entry->id;
 	popover_close();
 
@@ -135,6 +215,7 @@ void nav_go(const char* id) {
 	snprintf(crumbs, sizeof(crumbs), "Components|%s|%s", section->title, entry->title);
 	Rbreadcrumb_set_items(Rwidget_find(g_window, "crumbs"), crumbs);
 
+	update_arrows();
 	if (tree != R_INVALID_ID && !g_rebuilding) {
 		Rid item = find_tree_item(tree, entry->id);
 		if (item != R_INVALID_ID && Rtree_view_get_selected_item(tree) != item) {
@@ -184,7 +265,6 @@ void nav_rebuild(const char* filter) {
 			}
 			item = Rtree_view_add_item(tree, parent, entry->title);
 			Rtree_item_set_user_handle(item, (void*)entry);
-			if (g_page_icon != R_INVALID_ID) Rtree_item_set_icon(item, g_page_icon, 0.0f, 0.0f, 1.0f, 1.0f);
 		}
 	}
 	{
@@ -218,10 +298,6 @@ void nav_init(void) {
 		if (g_icons[s] != R_INVALID_ID && g_icons[s] != 0) continue;
 		snprintf(path, sizeof(path), "%s/icons/%s.svg", APP_UI_DIR, k_sections[s].icon);
 		g_icons[s] = Rtexture_create_from_file(path);
-	}
-	if (g_page_icon == 0 || g_page_icon == R_INVALID_ID) {
-		snprintf(path, sizeof(path), "%s/icons/dot.svg", APP_UI_DIR);
-		g_page_icon = Rtexture_create_from_file(path);
 	}
 	Rtree_view_set_selection_changed_callback(Rwidget_find(g_window, "nav"), on_tree_selection, NULL);
 	Rtree_view_set_activated_callback(Rwidget_find(g_window, "nav"), on_tree_activated, NULL);

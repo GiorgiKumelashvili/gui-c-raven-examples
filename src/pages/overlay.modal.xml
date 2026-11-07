@@ -4,6 +4,8 @@
 		<HBox Spacing="10">
 			<Button Text="Invite a teammate..." Style="Primary" OnClicked="modal.open.form"/>
 			<Button Text="Terms of service..." OnClicked="modal.open.terms"/>
+			<Button Text="No padding" OnClicked="modal.open.edge" Tooltip="Padding=&quot;0&quot;: the content touches the edges of the dialog"/>
+			<Button Text="1px padding" OnClicked="modal.open.hairline" Tooltip="Padding=&quot;1&quot;: a hairline frame around an inner card"/>
 		</HBox>
 		<Label Name="modal_result" Text="No dialog closed yet." Opacity="0.6"/>
 	</Demo>

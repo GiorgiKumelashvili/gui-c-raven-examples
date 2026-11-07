@@ -66,6 +66,8 @@ typedef struct DataTable {
 	Rid widget;
 	DtRow rows[DT_MAX_ROWS];
 	int order[DT_MAX_ROWS];
+	/* the order given by the user (dragged rows), shown when no column sorts */
+	int manual[DT_MAX_ROWS];
 	unsigned char checked[DT_MAX_ROWS];
 	unsigned char expanded[DT_MAX_ROWS];
 	RSpring unfold[DT_MAX_ROWS];
@@ -77,18 +79,28 @@ typedef struct DataTable {
 	float scroll_x, scroll_y;
 	float width, height;
 	int hover_row;
+	int hover_grip;
 	int hover_edge;
 	int hover_header;
 	int drag_col;
 	float drag_start_x, drag_start_w;
+	/* a row dragged by its grip: its place in the shown order, where it would go, the pointer */
+	int row_from;
+	int row_to;
+	float row_y;
 } DataTable;
+
+static DataTable* g_row_dragging;
 
 static DataTable* g_dragging;
 
 #define HEADER_H 36.0f
 #define ROW_H 36.0f
 #define DETAIL_H 62.0f
-#define GUTTER 64.0f
+#define GUTTER 84.0f
+#define GRIP_END 22.0f
+#define CHEVRON_END 42.0f
+#define CHECK_X 52.0f
 #define EDGE_GRAB 5.0f
 
 /* ---------------------------------------------------------------------------
@@ -130,6 +142,7 @@ static void dt_fill(DataTable* dt, int count) {
 		snprintf(row->updated, sizeof(row->updated), "2026-11-%02d", 1 + (int)((seed >> 10) % 7));
 		row->notes = notes[row->status];
 		dt->order[i] = i;
+		dt->manual[i] = i;
 		dt->checked[i] = 0;
 		dt->expanded[i] = 0;
 		memset(&dt->unfold[i], 0, sizeof(RSpring));
@@ -173,7 +186,7 @@ static int dt_compare(const void* pa, const void* pb) {
 
 static void dt_sort(DataTable* dt) {
 	int i;
-	for (i = 0; i < dt->row_count; i++) dt->order[i] = i;
+	for (i = 0; i < dt->row_count; i++) dt->order[i] = dt->manual[i];
 	if (dt->sort_col < 0) return;
 	g_sorting = dt;
 	qsort(dt->order, (size_t)dt->row_count, sizeof(int), dt_compare);
@@ -287,6 +300,17 @@ static Rgba dt_color(Rid widget, RColorRole role) {
 	return c;
 }
 
+/* A theme color made opaque over the window (the macOS looks give translucent ones). */
+static Rgba dt_solid(Rid widget, RColorRole role) {
+	Rgba c = dt_color(widget, role), w = dt_color(widget, R_COLOR_WINDOW);
+	Rgba out;
+	out.r = c.r * c.a + w.r * (1.0f - c.a);
+	out.g = c.g * c.a + w.g * (1.0f - c.a);
+	out.b = c.b * c.a + w.b * (1.0f - c.a);
+	out.a = 1.0f;
+	return out;
+}
+
 static void dt_checkbox(RPainter* p, Rid widget, float x, float y, int state) {
 	/* state: 0 off, 1 on, 2 some */
 	Rgba border = dt_color(widget, R_COLOR_CONTROL_BORDER);
@@ -392,9 +416,8 @@ static int dt_checked_count(const DataTable* dt) {
 
 static void dt_paint(Rid widget, RPainter* p, float width, float height, void* user_data) {
 	DataTable* dt = (DataTable*)user_data;
-	Rgba bg = dt_color(widget, R_COLOR_INPUT);
-	Rgba panel = dt_color(widget, R_COLOR_PANEL);
-	Rgba header = dt_color(widget, R_COLOR_HEADER);
+	Rgba bg = dt_solid(widget, R_COLOR_INPUT);
+	Rgba header = dt_solid(widget, R_COLOR_HEADER);
 	Rgba text = dt_color(widget, R_COLOR_TEXT);
 	Rgba line = dt_color(widget, R_COLOR_SEPARATOR);
 	Rgba border = dt_color(widget, R_COLOR_BORDER);
@@ -425,7 +448,7 @@ static void dt_paint(Rid widget, RPainter* p, float width, float height, void* u
 		if (top + h >= HEADER_H && top <= height) {
 			if (dt->checked[row]) Rdraw_rect(p, 0.0f, top, content_w, h, 0.0f, selection.r, selection.g, selection.b, selection.a * 0.45f);
 			else if (i == dt->hover_row) Rdraw_rect(p, 0.0f, top, content_w, h, 0.0f, hover.r, hover.g, hover.b, hover.a);
-			else if (dt->striped && (i & 1)) Rdraw_rect(p, 0.0f, top, content_w, h, 0.0f, panel.r, panel.g, panel.b, 0.45f);
+			else if (dt->striped && (i & 1)) Rdraw_rect(p, 0.0f, top, content_w, h, 0.0f, text.r, text.g, text.b, 0.035f);
 
 			/* the cells scroll sideways under the gutter */
 			Rdraw_push_clip_rect(p, GUTTER, top, width - GUTTER, ROW_H);
@@ -436,16 +459,25 @@ static void dt_paint(Rid widget, RPainter* p, float width, float height, void* u
 			}
 			Rdraw_pop_clip_rect(p);
 
-			/* the gutter: chevron and check box */
-			dt_chevron(p, 18.0f, top + ROW_H * 0.5f, unfold, text);
-			dt_checkbox(p, widget, 36.0f, top + (ROW_H - 16.0f) * 0.5f, dt->checked[row]);
+			/* the gutter: grip, chevron and check box */
+			{
+				float gy = top + ROW_H * 0.5f, ga = (i == dt->hover_row || i == dt->row_from) ? 0.7f : 0.3f;
+				int d;
+				for (d = 0; d < 3; d++) {
+					Rdraw_circle(p, 9.0f, gy - 5.0f + 5.0f * (float)d, 1.4f, text.r, text.g, text.b, ga);
+					Rdraw_circle(p, 14.0f, gy - 5.0f + 5.0f * (float)d, 1.4f, text.r, text.g, text.b, ga);
+				}
+			}
+			dt_chevron(p, 32.0f, top + ROW_H * 0.5f, unfold, text);
+			dt_checkbox(p, widget, CHECK_X, top + (ROW_H - 16.0f) * 0.5f, dt->checked[row]);
+			if (i == dt->row_from) Rdraw_rect(p, 0.0f, top, content_w, h, 0.0f, accent.r, accent.g, accent.b, 0.10f);
 
 			/* the details, unfolding */
 			if (unfold > 0.01f) {
 				char line1[160];
 				const DtRow* r = &dt->rows[row];
 				Rdraw_push_clip_rect(p, 0.0f, top + ROW_H, width, DETAIL_H * unfold);
-				Rdraw_rect(p, GUTTER - 8.0f, top + ROW_H + 2.0f, width - GUTTER - 8.0f, DETAIL_H - 10.0f, 6.0f, panel.r, panel.g, panel.b, 0.9f);
+				Rdraw_rect(p, GUTTER - 8.0f, top + ROW_H + 2.0f, width - GUTTER - 8.0f, DETAIL_H - 10.0f, 6.0f, text.r, text.g, text.b, 0.06f);
 				Rdraw_rect(p, GUTTER - 8.0f, top + ROW_H + 2.0f, 3.0f, DETAIL_H - 10.0f, 1.5f,
 					k_status_rgb[r->status][0], k_status_rgb[r->status][1], k_status_rgb[r->status][2], 1.0f);
 				snprintf(line1, sizeof(line1), "%s  -  %s  -  owned by %s  -  %s", r->id, r->name, r->owner, r->region);
@@ -456,6 +488,19 @@ static void dt_paint(Rid widget, RPainter* p, float width, float height, void* u
 			Rdraw_line(p, 0.0f, top + h - 0.5f, content_w, top + h - 0.5f, 1.0f, line.r, line.g, line.b, line.a * 0.6f);
 		}
 		top += h;
+	}
+	/* the row being dragged: where it would land, and a ghost under the pointer */
+	if (dt->row_from >= 0) {
+		float y = HEADER_H - dt->scroll_y;
+		const DtRow* r = &dt->rows[dt->order[dt->row_from]];
+		char label[80];
+		for (i = 0; i < dt->row_to && i < dt->row_count; i++) y += dt_row_height(dt, dt->order[i]);
+		Rdraw_rect(p, 4.0f, y - 1.5f, content_w - 8.0f, 3.0f, 1.5f, accent.r, accent.g, accent.b, 1.0f);
+		Rdraw_circle(p, 6.0f, y, 4.0f, accent.r, accent.g, accent.b, 1.0f);
+		snprintf(label, sizeof(label), "%s  %s", r->id, r->name);
+		Rdraw_rect(p, 24.0f, dt->row_y - 14.0f, 240.0f, 28.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.25f);
+		Rdraw_rect(p, 22.0f, dt->row_y - 16.0f, 240.0f, 28.0f, 8.0f, accent.r, accent.g, accent.b, 0.95f);
+		Rdraw_text(p, R_INVALID_ID, 0.0f, 34.0f, dt->row_y - 2.0f - g_text_h * 0.5f, label, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	Rdraw_pop_clip_rect(p);
 
@@ -485,7 +530,7 @@ static void dt_paint(Rid widget, RPainter* p, float width, float height, void* u
 	}
 	Rdraw_pop_clip_rect(p);
 	checked = dt_checked_count(dt);
-	dt_checkbox(p, widget, 36.0f, (HEADER_H - 16.0f) * 0.5f, checked == 0 ? 0 : checked == dt->row_count ? 1 : 2);
+	dt_checkbox(p, widget, CHECK_X, (HEADER_H - 16.0f) * 0.5f, checked == 0 ? 0 : checked == dt->row_count ? 1 : 2);
 	Rdraw_line(p, 0.0f, HEADER_H - 0.5f, width, HEADER_H - 0.5f, 1.0f, border.r, border.g, border.b, border.a);
 	if (dt->scroll_x > 0.0f) Rdraw_rect(p, GUTTER, 0.0f, 6.0f, height, 0.0f, 0.0f, 0.0f, 0.0f, 0.12f);
 
@@ -526,11 +571,13 @@ static int dt_event(Rid widget, const REvent* event, void* user_data) {
 		int edge = y < HEADER_H ? dt_edge_at(dt, x) : -1;
 		int header = y < HEADER_H ? dt_column_at(dt, x) : -1;
 		int row = dt_row_at(dt, y, NULL);
-		if (edge != dt->hover_edge || header != dt->hover_header || row != dt->hover_row) {
+		int grip = row >= 0 && x < GRIP_END;
+		if (edge != dt->hover_edge || header != dt->hover_header || row != dt->hover_row || grip != dt->hover_grip) {
+			dt->hover_grip = grip;
 			dt->hover_edge = edge;
 			dt->hover_header = header;
 			dt->hover_row = row;
-			Rwidget_set_cursor(dt->widget, edge >= 0 ? R_CURSOR_RESIZE_H : (y < HEADER_H || row >= 0) ? R_CURSOR_HAND : R_CURSOR_ARROW);
+			Rwidget_set_cursor(dt->widget, edge >= 0 ? R_CURSOR_RESIZE_H : (row >= 0 && x < GRIP_END) ? R_CURSOR_MOVE : (y < HEADER_H || row >= 0) ? R_CURSOR_HAND : R_CURSOR_ARROW);
 			Rwidget_invalidate(dt->widget);
 		}
 		return R_FALSE;
@@ -558,7 +605,7 @@ static int dt_event(Rid widget, const REvent* event, void* user_data) {
 				}
 				return R_TRUE;
 			}
-			if (x >= 28.0f && x < GUTTER) {
+			if (x >= CHEVRON_END && x < GUTTER) {
 				/* the check box of the header: all, or none */
 				int all = dt_checked_count(dt) != dt->row_count, i;
 				for (i = 0; i < dt->row_count; i++) dt->checked[i] = (unsigned char)all;
@@ -580,7 +627,15 @@ static int dt_event(Rid widget, const REvent* event, void* user_data) {
 		}
 		index = dt_row_at(dt, y, &in_detail);
 		if (index < 0 || in_detail) return R_TRUE;
-		if (x < 28.0f || event->clicks >= 2) {
+		if (x < GRIP_END) {
+			/* the grip: the row follows the pointer (dt_hook) */
+			dt->row_from = dt->row_to = index;
+			dt->row_y = y;
+			g_row_dragging = dt;
+			Rwidget_invalidate(dt->widget);
+			return R_TRUE;
+		}
+		if (x < CHEVRON_END || event->clicks >= 2) {
 			int row = dt->order[index];
 			dt->expanded[row] = (unsigned char)!dt->expanded[row];
 			Rwidget_invalidate(dt->widget);
@@ -614,9 +669,56 @@ static int dt_event(Rid widget, const REvent* event, void* user_data) {
 }
 
 /* Sees the window events while a column is dragged: the pointer may leave the table. */
+/* The place, in the shown order, a dragged row goes to: before the row whose middle is below y. */
+static int dt_insertion_at(const DataTable* dt, float y) {
+	float top = HEADER_H - dt->scroll_y;
+	int i;
+	for (i = 0; i < dt->row_count; i++) {
+		float h = dt_row_height(dt, dt->order[i]);
+		if (y < top + h * 0.5f) return i;
+		top += h;
+	}
+	return dt->row_count;
+}
+
+static int dt_row_hook(const REvent* event) {
+	DataTable* dt = g_row_dragging;
+	float wx, wy, ww, wh;
+	Rwidget_get_rect(dt->widget, &wx, &wy, &ww, &wh);
+	if (event->type == R_EVENT_MOUSE_MOVE) {
+		dt->row_y = event->y - wy;
+		/* near an edge, the rows scroll under the pointer */
+		if (dt->row_y < HEADER_H + 24.0f) dt->scroll_y -= 10.0f;
+		else if (dt->row_y > dt->height - 24.0f) dt->scroll_y += 10.0f;
+		dt_clamp_scroll(dt);
+		dt->row_to = dt_insertion_at(dt, dt->row_y);
+		Rwidget_invalidate(dt->widget);
+		return R_TRUE;
+	}
+	if (event->type == R_EVENT_MOUSE_UP && event->button == R_MOUSE_LEFT) {
+		int from = dt->row_from, to = dt->row_to, moved, i;
+		if (to > from) to--;
+		if (to != from && from >= 0) {
+			moved = dt->order[from];
+			if (to < from) memmove(&dt->order[to + 1], &dt->order[to], sizeof(int) * (size_t)(from - to));
+			else memmove(&dt->order[from], &dt->order[from + 1], sizeof(int) * (size_t)(to - from));
+			dt->order[to] = moved;
+			/* the order shown becomes the order of the user: no column sorts any more */
+			for (i = 0; i < dt->row_count; i++) dt->manual[i] = dt->order[i];
+			dt->sort_col = -1;
+		}
+		dt->row_from = dt->row_to = -1;
+		g_row_dragging = NULL;
+		dt_changed(dt);
+		return R_TRUE;
+	}
+	return R_FALSE;
+}
+
 static int dt_hook(const REvent* event) {
 	DataTable* dt = g_dragging;
 	float width;
+	if (g_row_dragging) return dt_row_hook(event);
 	if (!dt) return R_FALSE;
 	if (event->type == R_EVENT_MOUSE_MOVE) {
 		width = dt->drag_start_w + (event->x - dt->drag_start_x);
@@ -650,6 +752,7 @@ static void dt_destroy(Rid widget, void* user_data) {
 	DataTable* dt = (DataTable*)user_data;
 	(void)widget;
 	if (g_dragging == dt) g_dragging = NULL;
+	if (g_row_dragging == dt) g_row_dragging = NULL;
 	free(dt);
 }
 
@@ -668,6 +771,7 @@ static Rid dt_create(const char* tag, void* user_data) {
 	dt->sort_col = -1;
 	dt->striped = 1;
 	dt->drag_col = dt->hover_edge = dt->hover_header = dt->hover_row = -1;
+	dt->row_from = dt->row_to = -1;
 	for (i = 0; i < COL_COUNT; i++) dt->col_w[i] = k_default_widths[i];
 	dt_fill(dt, 24);
 	Rwidget_set_user_handle(widget, dt);
@@ -723,6 +827,11 @@ void datatable_command(Rid widget, const char* command) {
 		else if (strcmp(command, "invert") == 0) dt->checked[i] = (unsigned char)!dt->checked[i];
 		else if (strcmp(command, "expand-all") == 0) dt->expanded[i] = 1;
 		else if (strcmp(command, "collapse-all") == 0) dt->expanded[i] = 0;
+	}
+	if (strcmp(command, "reset-order") == 0) {
+		for (i = 0; i < dt->row_count; i++) dt->manual[i] = i;
+		dt->sort_col = -1;
+		dt_sort(dt);
 	}
 	if (strcmp(command, "reset-columns") == 0) {
 		for (i = 0; i < COL_COUNT; i++) dt->col_w[i] = k_default_widths[i];

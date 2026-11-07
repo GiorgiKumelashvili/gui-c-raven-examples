@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page Name="page.custom.datatable" Kind="Custom" Title="Data table" Subtitle="A CUSTOM widget painted with Raven's drawing API (src/datatable.c) and registered as the tag &lt;DataTable&gt;. Click a row or its box to toggle it, the box of the header for all; the chevron (or a double click) unfolds a row; drag the edge of a header to resize a column, double click it to fit; click a header to sort. Shift + wheel scrolls sideways.">
+<Page Name="page.custom.datatable" Kind="Custom" Title="Data table" Subtitle="A CUSTOM widget painted with Raven's drawing API (src/datatable.c) and registered as the tag &lt;DataTable&gt;. Click a row or its box to toggle it, the box of the header for all; the chevron (or a double click) unfolds a row; drag a row by its grip (the six dots) to move it; drag the edge of a header to resize a column, double click it to fit; click a header to sort. Shift + wheel scrolls sideways.">
 	<Demo Title="DataTable">
 		<HBox Spacing="8">
 			<ButtonGroup>
@@ -12,6 +12,7 @@
 				<Button Text="Collapse all" Style="Flat" OnClicked="dt.collapse-all"/>
 			</ButtonGroup>
 			<Button Text="Reset columns" Style="Flat" OnClicked="dt.reset-columns" Slot.VAlign="Center"/>
+			<Button Text="Reset order" Style="Flat" OnClicked="dt.reset-order" Slot.VAlign="Center"/>
 			<Spacer Slot.Fill="1"/>
 			<Label Name="dt_status" Text="0 of 24 rows selected" Opacity="0.6" Slot.VAlign="Center"/>
 		</HBox>

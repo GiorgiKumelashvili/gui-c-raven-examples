@@ -12,6 +12,7 @@
 
 	<Shortcut Keys="Super+F" Action="focus:nav_filter"/>
 	<Shortcut Keys="Super+Alt+S" Action="toggle:sidebar"/>
+	<Shortcut Keys="Super+K" Action="omni.open"/>
 
 	<Overlay>
 		<VBox>
@@ -59,6 +60,10 @@
 					<MenuItem Text="Toggle Sidebar" Shortcut="Super+Alt+S" OnClicked="toggle:sidebar"/>
 				</Menu>
 				<Menu Text="Go">
+					<MenuItem Text="Back" Shortcut="Super+[" OnClicked="nav.back"/>
+					<MenuItem Text="Forward" Shortcut="Super+]" OnClicked="nav.forward"/>
+					<MenuItem Text="Command Palette..." Shortcut="Super+K" OnClicked="omni.open"/>
+					<Separator/>
 					<MenuItem Text="Welcome" Shortcut="Super+1" OnClicked="go:home"/>
 					<MenuItem Text="Data Table" Shortcut="Super+2" OnClicked="go:custom.datatable"/>
 					<MenuItem Text="Segmented Control" Shortcut="Super+3" OnClicked="go:custom.segmented"/>
@@ -87,7 +92,8 @@
 							</VBox>
 						</HBox>
 						<TextInput Name="nav_filter" Placeholder="Filter components  (Cmd+F)" Slot.Padding="12,2"/>
-						<TreeView Name="nav" Slot.Fill="1" Slot.Padding="6,0,6,0"/>
+						<!-- a light hover on the rows, the same in dark and light looks -->
+						<TreeView Name="nav" Slot.Fill="1" Slot.Padding="6,0,6,0" Color.RowHovered="#8E8E9324"/>
 						<Separator/>
 						<HBox Spacing="6" Slot.Padding="12,2,12,10">
 							<Label Text="Raven native  /  custom" TextSize="11" Opacity="0.5" Slot.Fill="1" Slot.VAlign="Center"/>
@@ -100,7 +106,16 @@
 				<VBox Slot.Fill="0.77">
 					<HBox Spacing="8" Slot.Padding="16,10,16,10">
 						<Button Text="Sidebar" Style="Flat" OnClicked="toggle:sidebar" Tooltip="Show or hide the sidebar (Cmd+Alt+S)"/>
+						<ButtonGroup Gap="0">
+							<Button Name="nav_back" Style="Flat" OnClicked="nav.back" Tooltip="Back (Cmd+[, or swipe)" Enabled="false">
+								<Image Source="icons/chevron-left.svg" Width="14" Height="14" TintText="true"/>
+							</Button>
+							<Button Name="nav_forward" Style="Flat" OnClicked="nav.forward" Tooltip="Forward (Cmd+])" Enabled="false">
+								<Image Source="icons/chevron-right.svg" Width="14" Height="14" TintText="true"/>
+							</Button>
+						</ButtonGroup>
 						<Breadcrumb Name="crumbs" Items="Components" Slot.Fill="1" Slot.VAlign="Center"/>
+						<Button Text="Search   Cmd+K" Style="Flat" OnClicked="omni.open" Tooltip="Command palette: pages and commands"/>
 						<Button Text="GitHub" Style="Flat" OnClicked="open:https://github.com/oscar-soirey/Raven"/>
 					</HBox>
 					<Separator/>
@@ -146,6 +161,10 @@
 						<Include Source="pages/tools.timeline.xml"/>
 
 						<Include Source="pages/custom.nativemenu.xml"/>
+						<Include Source="pages/custom.finder.xml"/>
+						<Include Source="pages/custom.notify.xml"/>
+						<Include Source="pages/custom.omnibar.xml"/>
+						<Include Source="pages/custom.textarea.xml"/>
 						<Include Source="pages/custom.datatable.xml"/>
 						<Include Source="pages/custom.buttongroup.xml"/>
 						<Include Source="pages/custom.segmented.xml"/>
@@ -158,6 +177,8 @@
 
 		<!-- the popover (custom): a Canvas lets the mouse through where it has no child -->
 		<Canvas Name="popover_layer">
+			<!-- where a dragged row of a ListView or a Table lands (reorder.c) -->
+			<Border Name="drop_line" Visibility="Collapsed" Background="#0A84FF" CornerRadius="2"/>
 			<Border Name="popover" Visibility="Collapsed" Width="290" Padding="16" CornerRadius="12" BorderWidth="1" Shadow="28,0,10" Appear="Pop">
 				<VBox>
 					<VBox Name="share" Spacing="10">
@@ -201,6 +222,17 @@
 				</VBox>
 			</Border>
 		</Canvas>
+
+		<!-- the command palette (custom, omnibar.c): Cmd+K -->
+		<Border Name="omni_scrim" Visibility="Collapsed" Background="#00000059" CornerRadius="0" Appear="Fade"/>
+		<Border Name="omni" Visibility="Collapsed" Width="620" Padding="10" CornerRadius="14" BorderWidth="1" Shadow="44,0,18" Appear="Zoom"
+			Slot.HAlign="Center" Slot.VAlign="Top" Slot.Padding="0,90,0,0">
+			<VBox Spacing="8">
+				<TextInput Name="omni_input" Placeholder="Search pages and commands..." Metric.ControlHeight="38" Metric.FontSize="16"/>
+				<ListView Name="omni_list" Height="330"/>
+				<Label Text="Up / Down to move  -  Enter to open  -  Esc to close" TextSize="11" Opacity="0.5" Slot.HAlign="Center"/>
+			</VBox>
+		</Border>
 
 		<Toast Name="toast" Queue="Stack" MaxVisible="3" Slot.HAlign="Center" Slot.VAlign="Bottom" Slot.Padding="24"/>
 	</Overlay>

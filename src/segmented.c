@@ -8,6 +8,7 @@
  * as the rest of Raven moves. Left / Right change the choice from the keyboard.
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "app.h"
@@ -71,6 +72,17 @@ static void seg_measure(Rid widget, float* width, float* height, void* user_data
 	*height = seg_height(seg);
 }
 
+/* A theme color made opaque over the window: the macOS looks give translucent
+ * controls (white at a few percent in the dark look), meant to sit on what is behind. */
+static void seg_solid(Rid widget, RColorRole role, float* r, float* g, float* b) {
+	float cr, cg, cb, ca, wr, wg, wb, wa;
+	Rwidget_get_color(widget, role, &cr, &cg, &cb, &ca);
+	Rwidget_get_color(widget, R_COLOR_WINDOW, &wr, &wg, &wb, &wa);
+	*r = cr * ca + wr * (1.0f - ca);
+	*g = cg * ca + wg * (1.0f - ca);
+	*b = cb * ca + wb * (1.0f - ca);
+}
+
 static void seg_paint(Rid widget, RPainter* painter, float width, float height, void* user_data) {
 	Segmented* seg = seg_of(widget);
 	float r, g, b, a, tr, tg, tb, ta, ar, ag, ab, aa, cr, cg, cb, ca;
@@ -102,7 +114,13 @@ static void seg_paint(Rid widget, RPainter* painter, float width, float height, 
 		Rwidget_get_color(widget, R_COLOR_SHADOW, &r, &g, &b, &a);
 		Rdraw_rect(painter, x, inset + 1.0f, w, height - inset * 2.0f, radius - 1.0f, r, g, b, a * 0.35f);
 		if (seg->primary) Rwidget_get_color(widget, R_COLOR_ACCENT, &cr, &cg, &cb, &ca);
-		else Rwidget_get_color(widget, R_COLOR_CONTROL, &cr, &cg, &cb, &ca);
+		else {
+			/* the thumb stands out of the track: the control color, a little lifted */
+			float tr0, tg0, tb0;
+			seg_solid(widget, R_COLOR_TRACK, &tr0, &tg0, &tb0);
+			seg_solid(widget, R_COLOR_CONTROL, &cr, &cg, &cb);
+			if (fabsf(cr - tr0) + fabsf(cg - tg0) + fabsf(cb - tb0) < 0.08f) seg_solid(widget, R_COLOR_CONTROL_HOVERED, &cr, &cg, &cb);
+		}
 		Rdraw_rect(painter, x, inset, w, height - inset * 2.0f, radius - 1.0f, cr, cg, cb, 1.0f);
 		Rwidget_get_color(widget, R_COLOR_CONTROL_BORDER, &r, &g, &b, &a);
 		if (!seg->primary) Rdraw_rect_outline(painter, x, inset, w, height - inset * 2.0f, radius - 1.0f, 1.0f, r, g, b, a * 0.6f);

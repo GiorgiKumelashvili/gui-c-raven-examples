@@ -122,4 +122,29 @@
 			</HBox>
 		</Border>
 	</Widget>
+
+	<!--
+	  Native file input (custom, macOS): the same field, but the button opens
+	  the panel of Finder (NSOpenPanel) as a sheet of the window.
+	  Kind: "" any file, images, documents, multi, folder.
+	-->
+	<Widget Name="NativeFileInput" Placeholder="No file selected" Browse="Choose..." Kind="">
+		<Border CornerRadius="7" BorderWidth="1" Padding="3">
+			<HBox Spacing="6">
+				<Label Text="{Placeholder}" Opacity="0.5" Slot.Fill="1" Slot.VAlign="Center" Slot.Padding="8,0"/>
+				<Button Text="{Browse}" OnClicked="{empty(Kind) ? 'finder.open' : 'finder.open:' + Kind}"/>
+			</HBox>
+		</Border>
+	</Widget>
+
+	<!--
+	  A textarea as on the web (custom): Raven's TextEditor without what makes
+	  it a code editor. No line numbers, no mark on the line of the caret
+	  (Color.RowHovered is what paints it), no proposals, no closing brackets,
+	  the font of the interface (no Language), lines that wrap.
+	-->
+	<Widget Name="PlainTextArea" Placeholder="" Lines="4" Text="">
+		<TextEditor Text="{Text}" Placeholder="{Placeholder}" LineNumbers="false" Wrap="true" Completion="false" AutoPairs="false"
+			Zoomable="false" Color.RowHovered="transparent" Height="{Lines * 22 + 18}"/>
+	</Widget>
 </Widgets>

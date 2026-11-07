@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.finder" Kind="Custom" Title="Finder file panels" Subtitle="On macOS, Raven's Rfile_dialog_open shows Raven's own file browser (it uses the system dialog on Windows and Linux). These fields open the panels of Finder itself, NSOpenPanel and NSSavePanel, as sheets that slide out of the title bar (src/native_macos.m): sidebar, iCloud, tags, Quick Look with the space bar, everything.">
+	<Demo Title="NSOpenPanel" Note="&lt;NativeFileInput Kind=&quot;...&quot;/&gt;: a tag of src/widgets.xml.">
+		<VBox Spacing="10">
+			<Field Label="Any file"><NativeFileInput Slot.Fill="1"/></Field>
+			<Field Label="Images only"><NativeFileInput Placeholder="No image selected" Kind="images" Slot.Fill="1"/></Field>
+			<Field Label="Documents"><NativeFileInput Placeholder="PDF, text, Markdown, XML, JSON" Kind="documents" Slot.Fill="1"/></Field>
+			<Field Label="Several files"><NativeFileInput Placeholder="Cmd-click to choose several" Kind="multi" Slot.Fill="1"/></Field>
+			<Field Label="A folder"><NativeFileInput Placeholder="No folder selected" Kind="folder" Slot.Fill="1"/></Field>
+		</VBox>
+	</Demo>
+	<Demo Title="NSSavePanel and Finder" Note="Reveal in Finder selects the last file chosen in a Finder window (NSWorkspace).">
+		<HBox Spacing="10">
+			<Button Text="Save as..." Style="Primary" OnClicked="finder.save"/>
+			<Button Name="finder_reveal" Text="Reveal in Finder" Enabled="false" OnClicked="finder.reveal"/>
+			<Button Text="Open Home in Finder" Style="Flat" OnClicked="finder.home"/>
+			<Button Text="Open Downloads" Style="Flat" OnClicked="finder.downloads"/>
+		</HBox>
+		<Label Name="finder_status" Text="Nothing chosen yet." Font="monospace" TextSize="12" Opacity="0.7" Wrap="true" Selectable="true"/>
+	</Demo>
+</Page>

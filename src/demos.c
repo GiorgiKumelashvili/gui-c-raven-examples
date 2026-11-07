@@ -80,6 +80,13 @@ static void on_modal(Rid sender, const char* action, void* user_data) {
 	if (strcmp(action, "modal.open") == 0 || strcmp(action, "modal.open.form") == 0) {
 		Rid content = Rwidget_create_from_xml_file(APP_UI_DIR "/dialogs/invite.xml");
 		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
+	} else if (strcmp(action, "modal.open.edge") == 0 || strcmp(action, "modal.open.hairline") == 0) {
+		Rid content = Rwidget_create_from_xml_file(strcmp(action, "modal.open.edge") == 0
+			? APP_UI_DIR "/dialogs/edge.xml" : APP_UI_DIR "/dialogs/hairline.xml");
+		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
+	} else if (strcmp(action, "modal.done") == 0) {
+		set_label("modal_result", "Closed with its button.");
+		Rdialog_close(sender, 1);
 	} else if (strcmp(action, "modal.open.terms") == 0) {
 		Rid content = Rwidget_create_from_xml_file(APP_UI_DIR "/dialogs/terms.xml");
 		if (content != R_INVALID_ID) Rdialog_open(g_window, content, on_modal_closed, NULL);
@@ -144,9 +151,47 @@ static void on_toast(Rid sender, const char* action, void* user_data) {
 static float g_progress;
 static int g_progress_running;
 
+/* ---- widgets with Class="noanim": Raven's animations are global, so they are
+ * turned off while such a widget is used and its popup is open ---- */
+static int g_noanim;
+static int g_noanim_quiet_frames;
+
+static int noanim_hook(const REvent* event) {
+	Rid widget;
+	if (event->type != R_EVENT_MOUSE_DOWN && event->type != R_EVENT_KEY_DOWN) return R_FALSE;
+	for (widget = event->target; widget != R_INVALID_ID; widget = Rwidget_get_parent(widget)) {
+		if (Rwidget_has_class(widget, "noanim")) {
+			Rset_animations_enabled(R_FALSE);
+			g_noanim = 1;
+			g_noanim_quiet_frames = 0;
+			break;
+		}
+	}
+	return R_FALSE;
+}
+
+static void noanim_frame(void) {
+	if (!g_noanim) return;
+	/* a few frames without any popup: the menu or the list is closed */
+	if (Rwindow_has_popup(g_window)) g_noanim_quiet_frames = 0;
+	else if (++g_noanim_quiet_frames > 3) {
+		g_noanim = 0;
+		Rset_animations_enabled(R_TRUE);
+	}
+}
+
+static double g_attention_at;
+
 static void on_frame(double delta, void* user_data) {
 	char text[48];
 	(void)user_data;
+	noanim_frame();
+	reorder_frame();
+	if (g_attention_at > 0.0 && Rget_time() >= g_attention_at) {
+		g_attention_at = 0.0;
+		native_request_attention();
+	}
+	if (g_noanim || g_attention_at > 0.0) Rwake_up();
 	if (!g_progress_running) return;
 	g_progress += (float)delta * 0.25f;
 	if (g_progress >= 1.0f) {
@@ -391,6 +436,119 @@ static void browse(Rid sender, const char* kind) {
 }
 
 /* ---------------------------------------------------------------------------
+ *  macOS: Finder panels and notifications
+ * ------------------------------------------------------------------------- */
+
+static Rid g_finder_label = R_INVALID_ID;
+static char g_finder_path[1024];
+
+static void on_finder_paths(int count, const char* const* paths, void* user_data) {
+	char text[1200];
+	int i, length = 0;
+	(void)user_data;
+	if (count == 0) {
+		set_label("finder_status", "Cancelled.");
+		return;
+	}
+	snprintf(g_finder_path, sizeof(g_finder_path), "%s", paths[0]);
+	if (g_finder_label != R_INVALID_ID) {
+		const char* slash = strrchr(paths[0], '/');
+		if (count > 1) snprintf(text, sizeof(text), "%d files chosen", count);
+		else snprintf(text, sizeof(text), "%s", slash && slash[1] ? slash + 1 : paths[0]);
+		Rlabel_set_text(g_finder_label, text);
+		Rwidget_set_attribute(g_finder_label, "Opacity", "1");
+	}
+	text[0] = '\0';
+	for (i = 0; i < count && i < 6 && length < (int)sizeof(text) - 1; i++) {
+		length += snprintf(text + length, sizeof(text) - (size_t)length, "%s%s", i ? "\n" : "", paths[i]);
+	}
+	if (count > 6 && length < (int)sizeof(text) - 1) snprintf(text + length, sizeof(text) - (size_t)length, "\n... and %d more", count - 6);
+	set_label("finder_status", text);
+	Rwidget_set_enabled(W("finder_reveal"), R_TRUE);
+}
+
+static void on_finder(Rid sender, const char* action, void* user_data) {
+	(void)user_data;
+	if (strncmp(action, "finder.open", 11) == 0) {
+		/* the label of the field is the first child of the row of the button */
+		Rid row = Rwidget_get_parent(sender);
+		g_finder_label = row != R_INVALID_ID ? Rwidget_get_child(row, 0) : R_INVALID_ID;
+		if (!native_open_panel(g_window, action[11] == ':' ? action + 12 : NULL, on_finder_paths, NULL)) {
+			set_label("finder_status", "No Finder panel on this system.");
+		}
+	} else if (strcmp(action, "finder.save") == 0) {
+		g_finder_label = R_INVALID_ID;
+		native_save_panel(g_window, "Untitled report.pdf", on_finder_paths, NULL);
+	} else if (strcmp(action, "finder.reveal") == 0) {
+		native_reveal_in_finder(g_finder_path);
+	} else if (strcmp(action, "finder.home") == 0) {
+		native_open_in_finder("~");
+	} else if (strcmp(action, "finder.downloads") == 0) {
+		native_open_in_finder("~/Downloads");
+	}
+}
+
+static void on_notify_status(const char* status, void* user_data) {
+	(void)user_data;
+	set_label("notify_status", status);
+}
+
+static void on_notify(Rid sender, const char* action, void* user_data) {
+	static int badge;
+	char text[16];
+	(void)sender;
+	(void)user_data;
+	if (strcmp(action, "notify.simple") == 0) {
+		native_notify("Raven Components", "", "Hello from a Raven app: this is the Notification Center of macOS.", 0, 0.0, on_notify_status, NULL);
+	} else if (strcmp(action, "notify.rich") == 0) {
+		native_notify("Build finished", "raven_app - Release", "128 files compiled in 8.2 s. 0 warnings.", 1, 0.0, on_notify_status, NULL);
+	} else if (strcmp(action, "notify.delayed") == 0) {
+		native_notify("Reminder", "Stand-up in 5 minutes", "Scheduled 5 seconds ago. Switch to another app to see it arrive.", 1, 5.0, on_notify_status, NULL);
+		set_label("notify_status", "Scheduling...");
+	} else if (strcmp(action, "notify.raven") == 0) {
+		int shown = Rnotification_show("Raven's own API", "Rnotification_show: the notification of the system, where Raven can.", R_NOTIFICATION_NORMAL);
+		set_label("notify_status", shown ? "Rnotification_show: shown by Raven" : "Rnotification_show: not available (the app is not a bundle?)");
+	} else if (strcmp(action, "notify.badge") == 0) {
+		snprintf(text, sizeof(text), "%d", ++badge);
+		native_dock_badge(text);
+		set_label("notify_status", "Look at the Dock icon.");
+	} else if (strcmp(action, "notify.badge.clear") == 0) {
+		badge = 0;
+		native_dock_badge(NULL);
+		set_label("notify_status", "Badge cleared.");
+	} else if (strcmp(action, "notify.attention") == 0) {
+		g_attention_at = Rget_time() + 3.0;
+		set_label("notify_status", "Switch to another app now: the Dock icon bounces in 3 seconds.");
+	}
+}
+
+static void on_history(Rid sender, const char* action, void* user_data) {
+	(void)sender;
+	(void)user_data;
+	if (strcmp(action, "nav.back") == 0) nav_back();
+	else nav_forward();
+}
+
+/* Trackpad swipes and the side buttons of a mouse go back and forward. */
+static int history_hook(const REvent* event) {
+	if (event->type != R_EVENT_MOUSE_DOWN) return R_FALSE;
+	if (event->button == R_MOUSE_X1) nav_back();
+	else if (event->button == R_MOUSE_X2) nav_forward();
+	else return R_FALSE;
+	return R_TRUE;
+}
+
+static void on_textarea(Rid sender, const char* action, void* user_data) {
+	char text[48];
+	int length = Rtext_editor_get_length(sender);
+	(void)action;
+	(void)user_data;
+	snprintf(text, sizeof(text), "%d / 280", length);
+	set_label("textarea_count", text);
+	Rwidget_set_attribute(W("textarea_count"), "Color", length > 280 ? "#E5484D" : "#8B8D98");
+}
+
+/* ---------------------------------------------------------------------------
  *  Small things of the other pages
  * ------------------------------------------------------------------------- */
 
@@ -475,7 +633,8 @@ static void on_any(Rid sender, const char* action, void* user_data) {
 
 void demos_init(void) {
 	static const char* const alerts[] = { "alert.info", "alert.confirm", "alert.danger", "alert.save" };
-	static const char* const modals[] = { "modal.open", "modal.open.form", "modal.open.terms", "modal.ok", "modal.accept", "modal.cancel" };
+	static const char* const modals[] = { "modal.open", "modal.open.form", "modal.open.terms", "modal.ok", "modal.accept", "modal.cancel",
+		"modal.open.edge", "modal.open.hairline", "modal.done" };
 	static const char* const toasts[] = { "toast.info", "toast.success", "toast.warning", "toast.error", "toast.action", "toast.burst", "toast.queue", "toast.clear" };
 	static const char* const values[] = {
 		"date.changed", "time.changed", "rating.changed", "page.changed", "color.changed", "slider.changed", "text.commit",
@@ -497,6 +656,19 @@ void demos_init(void) {
 	Raction_bind("seg.view", on_segmented, NULL);
 	Raction_bind("bg.select", on_group_select, NULL);
 	Raction_bind("bg.toggle", on_group_toggle, NULL);
+	{
+		static const char* const finder[] = { "finder.open", "finder.open:images", "finder.open:documents", "finder.open:multi",
+			"finder.open:folder", "finder.save", "finder.reveal", "finder.home", "finder.downloads" };
+		static const char* const notify[] = { "notify.simple", "notify.rich", "notify.delayed", "notify.raven",
+			"notify.badge", "notify.badge.clear", "notify.attention" };
+		for (i = 0; i < sizeof(finder) / sizeof(finder[0]); i++) Raction_bind(finder[i], on_finder, NULL);
+		for (i = 0; i < sizeof(notify) / sizeof(notify[0]); i++) Raction_bind(notify[i], on_notify, NULL);
+	}
+	Raction_bind("nav.back", on_history, NULL);
+	Raction_bind("nav.forward", on_history, NULL);
+	Raction_bind("textarea.changed", on_textarea, NULL);
+	app_add_event_hook(noanim_hook);
+	app_add_event_hook(history_hook);
 	Raction_set_default_handler(on_any, NULL);
 	Rset_frame_callback(on_frame, NULL);
 

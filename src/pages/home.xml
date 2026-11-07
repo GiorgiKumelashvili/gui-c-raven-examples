@@ -36,5 +36,12 @@
 | Toast | Overlays | `<Toast>` |
 | Tooltip | Overlays | `Tooltip=` on any widget |
 | Date picker | Date & time | `<DatePicker>` |
+| Finder file panels | Custom | NSOpenPanel / NSSavePanel as sheets (`native_macos.m`) |
+| macOS notifications | Custom | UNUserNotificationCenter; the app is built as a bundle for it |
+| Reorder rows | Data table, Choice & lists, Table | grip drag (custom); drag or Alt+Up/Down (`reorder.c`) |
+| No animation | Choice & lists, Menu bar | `Class="noanim"`: animations off while it is used |
+| Omni bar | Custom | `omnibar.c`, also Cmd+K over the window |
+| Plain textarea | Custom | `<PlainTextArea>`: TextEditor without its code features |
+| Back / forward | header arrows | history in `nav.c`, Cmd+[ / Cmd+], swipe |
 ]]></Label>
 </Page>

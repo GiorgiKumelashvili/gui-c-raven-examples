@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.omnibar" Kind="Custom" Title="Omni bar" Subtitle="One field that finds every page and runs commands (themes, sidebar, history, notifications). Type a few letters: every word must match; titles that start with them come first. Up / Down move, Enter or a click runs, Escape clears. src/omnibar.c; the same code drives the command palette laid over the window with Cmd+K.">
+	<Demo Title="Inline" Note="A TextInput over a ListView.">
+		<TextInput Name="omni_page_input" Placeholder="Try: table, dark, notif, back..." Metric.ControlHeight="36" Metric.FontSize="15"/>
+		<ListView Name="omni_page_list" Height="280"/>
+	</Demo>
+	<Demo Title="Command palette" Note="Over everything, with a dimmed background; a click outside closes it.">
+		<Button Text="Open the command palette   Cmd+K" Style="Primary" Slot.HAlign="Left" OnClicked="omni.open"/>
+	</Demo>
+</Page>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Padding="1": the colored dialog shows as a 1px frame around the card inside it. -->
+<Border Padding="1" CornerRadius="14" Width="420" Background="#3E63DD">
+	<Border Padding="20" CornerRadius="13">
+		<VBox Spacing="14">
+			<Label Text="1px padding" TextSize="20"/>
+			<Label Wrap="true" Opacity="0.8" Text="The dialog is blue and has a padding of one unit; the card inside it has the color of the theme. What is left of the blue is a hairline frame."/>
+			<HBox Spacing="8" Slot.HAlign="Right">
+				<Button Text="Cancel" OnClicked="modal.cancel"/>
+				<Button Text="OK" Style="Primary" OnClicked="modal.done"/>
+			</HBox>
+		</VBox>
+	</Border>
+</Border>

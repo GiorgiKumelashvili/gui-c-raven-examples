@@ -11,6 +11,15 @@
 			<ComboBox Items="Disabled" Selected="0" Enabled="false" Width="140"/>
 		</HBox>
 	</Demo>
+	<Demo Title="ComboBox without animation" Note="Class=&quot;noanim&quot;: the list appears and goes at once. Raven's animations are global (Rset_animations_enabled), so demos.c turns them off while such a widget is used.">
+		<HBox Spacing="12">
+			<ComboBox Class="noanim" Items="Helvetica|Inter|SF Pro|JetBrains Mono|Georgia" Selected="1" Width="200"/>
+			<ComboBox Items="Helvetica|Inter|SF Pro|JetBrains Mono|Georgia" Selected="1" Width="200" Tooltip="This one is animated, to compare"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Reorderable ListView" Note="Drag a row to another place, or select one and press Alt+Up / Alt+Down. Raven's ListView cannot reorder: src/reorder.c moves the texts.">
+		<ListView Name="reorder_list" Height="230" Selected="0" Items="1. Design the window in XML|2. Bind the actions in C|3. Paint the custom widgets|4. Add the macOS services|5. Theme it|6. Ship it"/>
+	</Demo>
 	<Demo Title="ListView" Note="Arrow keys move the selection; a double click or Enter activates.">
 		<ListView Height="170" Selected="1" Items="Inbox|Drafts|Sent|Archive|Spam|Trash|Newsletters|Receipts|Travel"/>
 	</Demo>

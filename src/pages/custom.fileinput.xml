@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page Name="page.custom.fileinput" Kind="Custom" Title="File input" Subtitle="As Blueprint's FileInput: the name of the file chosen and a Browse button. &lt;FileInput&gt; is declared in src/widgets.xml; the button opens the file dialog of the system (Rfile_dialog_open), or Raven's own.">
+<Page Name="page.custom.fileinput" Kind="Custom" Title="File input" Subtitle="As Blueprint's FileInput: the name of the file chosen and a Browse button. &lt;FileInput&gt; is declared in src/widgets.xml; the button calls Rfile_dialog_open: the dialog of the system on Windows and Linux, Raven's own browser on macOS. For the panels of Finder, see Finder file panels.">
 	<Demo Title="FileInput">
 		<VBox Spacing="10">
 			<Field Label="Any file"><FileInput Slot.Fill="1"/></Field>

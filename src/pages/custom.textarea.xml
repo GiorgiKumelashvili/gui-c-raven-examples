@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.textarea" Kind="Custom" Title="Plain textarea" Subtitle="Raven's TextEditor is made for code. &lt;PlainTextArea&gt; (src/widgets.xml) turns that off to get a textarea as on the web: no line numbers, no highlighted line, no proposals or closing brackets, the font of the interface, wrapped lines. Compare with the code editor below.">
+	<Demo Title="PlainTextArea">
+		<VBox Spacing="6">
+			<Label Text="Comment" Opacity="0.75"/>
+			<TextEditor Placeholder="Write a comment..." LineNumbers="false" Wrap="true" Completion="false" AutoPairs="false" Zoomable="false"
+				Color.RowHovered="transparent" Height="110" OnChanged="textarea.changed"/>
+			<HBox>
+				<Label Text="Plain text, wraps, no code features." TextSize="11" Opacity="0.5" Slot.Fill="1"/>
+				<Label Name="textarea_count" Text="0 / 280" TextSize="11" Color="#8B8D98"/>
+			</HBox>
+		</VBox>
+		<VBox Spacing="6">
+			<Label Text="Address" Opacity="0.75"/>
+			<PlainTextArea Lines="3" Placeholder="Street, city, postal code"/>
+		</VBox>
+	</Demo>
+	<Demo Title="The code editor, for comparison" Note="Click inside: line numbers, the line of the caret marked, proposals while typing.">
+		<TextEditor Language="Markdown" LineNumbers="true" Height="90" Text="# The same widget&#10;with what a code editor needs."/>
+	</Demo>
+</Page>

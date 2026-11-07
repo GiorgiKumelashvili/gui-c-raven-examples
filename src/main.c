@@ -81,6 +81,7 @@ static void on_reload(const char* path, int ok, void* user_data) {
 	if (!ok) return;
 	nav_init();
 	demos_bind_widgets();
+	omnibar_bind_widgets();
 }
 
 int main(void) {
@@ -95,6 +96,8 @@ int main(void) {
 	segmented_register();
 	demos_init();
 	popover_init();
+	reorder_init();
+	omnibar_init();
 
 	/* APP_THEME=MacOSLight: start with another look */
 	if (getenv("APP_THEME")) Rtheme_use(getenv("APP_THEME"));
@@ -109,6 +112,7 @@ int main(void) {
 
 	nav_init();
 	demos_bind_widgets();
+	omnibar_bind_widgets();
 	/* APP_PAGE=custom.datatable ./build/raven_app opens on that page */
 	if (getenv("APP_PAGE")) nav_go(getenv("APP_PAGE"));
 

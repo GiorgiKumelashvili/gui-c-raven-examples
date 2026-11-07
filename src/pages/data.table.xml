@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page Name="page.data.table" Title="Table" Subtitle="Raven's Table: columns that are resized by dragging the edge of their header (a double click fits them) and sorted by a click; any number of rows (virtual mode). For check boxes in rows, rows that unfold and colored cells, see Custom, Data table.">
+<Page Name="page.data.table" Title="Table" Subtitle="Raven's Table: columns that are resized by dragging the edge of their header (a double click fits them) and sorted by a click; any number of rows (virtual mode). Rows can be dragged to another place (src/reorder.c: Raven's Table cannot reorder by itself). For check boxes in rows, rows that unfold and colored cells, see Custom, Data table.">
 	<Demo Title="Table">
 		<HBox Spacing="16">
 			<Checkbox Text="Striped" Checked="true" OnChanged="table.striped"/>
 			<Checkbox Text="Grid lines" OnChanged="table.grid"/>
 			<Checkbox Text="Header" Checked="true" OnChanged="table.header"/>
 		</HBox>
-		<Table Name="raven_table" Striped="true" Height="320">
+		<Label Text="Drag a row to move it, or select one and press Alt+Up / Alt+Down. Sorting by a header still works." TextSize="12" Opacity="0.6"/>
+		<Table Name="raven_table" Striped="true" Height="390">
 			<Column Header="Element" Width="140"/>
 			<Column Header="Symbol" Width="80" Align="Center"/>
 			<Column Header="Number" Width="80" Align="Right"/>

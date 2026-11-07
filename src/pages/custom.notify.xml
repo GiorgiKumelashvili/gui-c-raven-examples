@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.notify" Kind="Custom" Title="macOS notifications" Subtitle="Banners of the Notification Center, sent with UNUserNotificationCenter (src/native_macos.m). The first one makes macOS ask for permission. They need an application bundle: the app is built as build/raven_app.app for that. When macOS refuses, the app falls back on AppleScript (shown as coming from Script Editor).">
+	<Demo Title="Notification Center">
+		<HBox Spacing="10">
+			<Button Text="Simple" Style="Primary" OnClicked="notify.simple"/>
+			<Button Text="Subtitle and sound" OnClicked="notify.rich"/>
+			<Button Text="In 5 seconds" OnClicked="notify.delayed"/>
+			<Button Text="Raven's Rnotification_show" Style="Flat" OnClicked="notify.raven"/>
+		</HBox>
+	</Demo>
+	<Demo Title="The Dock" Note="NSDockTile: a badge on the icon; requestUserAttention bounces it while the app is not in front.">
+		<HBox Spacing="10">
+			<Button Text="Badge +1" OnClicked="notify.badge"/>
+			<Button Text="Clear badge" Style="Flat" OnClicked="notify.badge.clear"/>
+			<Button Text="Bounce in 3 s" OnClicked="notify.attention"/>
+		</HBox>
+	</Demo>
+	<Label Name="notify_status" Text="Nothing sent yet." Opacity="0.65" Wrap="true"/>
+</Page>
