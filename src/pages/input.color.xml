@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.color" Title="Color picker" Subtitle="A complete picker: square, hues, opacity, code, numbers and swatches; as a panel or as a swatch that opens it.">
+	<HBox Spacing="14">
+		<Demo Title="Full" Slot.Fill="1">
+			<ColorPicker Color="#3E63DD" Previous="#8E4EC6" Swatches="#E5484D, #F76B15, #FFC53D, #30A46C, #12A594, #3E63DD, #8E4EC6, #D6409F" OnChanged="color.changed"/>
+			<Label Name="color_status" Text="Color: #3E63DD" Opacity="0.6"/>
+		</Demo>
+		<VBox Spacing="14" Slot.Fill="1">
+			<Demo Title="Compact">
+				<ColorPicker Color="#30A46C" Compact="true" Alpha="false"/>
+			</Demo>
+			<Demo Title="Popup swatches" Note="Popup=&quot;true&quot;: a swatch the size of a button.">
+				<HBox Spacing="10">
+					<ColorPicker Color="#E5484D" Popup="true"/>
+					<ColorPicker Color="#FFC53D" Popup="true"/>
+					<ColorPicker Color="#12A594" Popup="true"/>
+					<ColorPicker Color="#8E4EC6" Popup="true"/>
+				</HBox>
+			</Demo>
+		</VBox>
+	</HBox>
+</Page>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.buttongroup" Kind="Custom" Title="Button group" Subtitle="Raven has no button group: &lt;ButtonGroup&gt; is a tag declared in src/widgets.xml, a bordered track of flat buttons. With OnClicked=&quot;bg.select&quot; one button is chosen at a time; with &quot;bg.toggle&quot; each is on or off.">
+	<Demo Title="Exclusive" Note="Like a radio group, but buttons.">
+		<ButtonGroup>
+			<Button Text="Left" Style="Primary" OnClicked="bg.select"/>
+			<Button Text="Center" Style="Flat" OnClicked="bg.select"/>
+			<Button Text="Right" Style="Flat" OnClicked="bg.select"/>
+			<Button Text="Justify" Style="Flat" OnClicked="bg.select"/>
+		</ButtonGroup>
+		<Label Name="bg_status" Text="Chosen: Left" Opacity="0.6"/>
+	</Demo>
+	<Demo Title="Toggles" Note="Each button keeps its own state.">
+		<ButtonGroup>
+			<Button Text="Bold" Style="Flat" OnClicked="bg.toggle"/>
+			<Button Text="Italic" Style="Flat" OnClicked="bg.toggle"/>
+			<Button Text="Underline" Style="Flat" OnClicked="bg.toggle"/>
+			<Button Text="Strike" Style="Flat" OnClicked="bg.toggle"/>
+		</ButtonGroup>
+	</Demo>
+	<Demo Title="Actions" Note="Plain buttons side by side, each with its own action.">
+		<HBox Spacing="12">
+			<ButtonGroup>
+				<Button Text="Copy" OnClicked="say:Copied"/>
+				<Button Text="Paste" OnClicked="say:Pasted"/>
+				<Button Text="Duplicate" OnClicked="say:Duplicated"/>
+			</ButtonGroup>
+			<ButtonGroup Gap="0">
+				<Button Text="&lt;" Style="Flat" OnClicked="say:Back"/>
+				<Button Text="&gt;" Style="Flat" OnClicked="say:Forward"/>
+			</ButtonGroup>
+		</HBox>
+	</Demo>
+	<Demo Title="Fill" Note="&lt;ButtonGroupFill&gt; with Slot.Fill on the buttons: as wide as its place.">
+		<ButtonGroupFill>
+			<Button Text="Day" Style="Flat" Slot.Fill="1" OnClicked="bg.select"/>
+			<Button Text="Week" Style="Primary" Slot.Fill="1" OnClicked="bg.select"/>
+			<Button Text="Month" Style="Flat" Slot.Fill="1" OnClicked="bg.select"/>
+			<Button Text="Year" Style="Flat" Slot.Fill="1" OnClicked="bg.select"/>
+		</ButtonGroupFill>
+	</Demo>
+</Page>

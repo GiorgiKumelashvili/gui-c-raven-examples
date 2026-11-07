@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.text" Title="Text fields" Subtitle="TextInput for one line, TextEditor for many. Undo, selection, clipboard, IME and the keyboard of the system are there.">
+	<Demo Title="TextInput" Note="Press Enter in the first field: OnCommitted fires an action.">
+		<VBox Spacing="10">
+			<Field Label="Name"><TextInput Placeholder="Ada Lovelace" OnCommitted="text.commit" Slot.Fill="1"/></Field>
+			<Field Label="Password"><TextInput Password="true" Text="hunter2" Slot.Fill="1"/></Field>
+			<Field Label="Read only"><TextInput ReadOnly="true" Text="You can select and copy this" Slot.Fill="1"/></Field>
+			<Field Label="Max 8 characters"><TextInput MaxLength="8" Placeholder="ABC-1234" Slot.Fill="1"/></Field>
+			<Field Label="Disabled"><TextInput Enabled="false" Text="Not now" Slot.Fill="1"/></Field>
+		</VBox>
+	</Demo>
+	<Demo Title="TextEditor" Note="Many lines, with a placeholder. See Text &amp; code for languages.">
+		<TextEditor Height="120" Wrap="true" Placeholder="Write a note..." LineNumbers="false"/>
+	</Demo>
+</Page>

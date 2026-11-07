@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.fileinput" Kind="Custom" Title="File input" Subtitle="As Blueprint's FileInput: the name of the file chosen and a Browse button. &lt;FileInput&gt; is declared in src/widgets.xml; the button opens the file dialog of the system (Rfile_dialog_open), or Raven's own.">
+	<Demo Title="FileInput">
+		<VBox Spacing="10">
+			<Field Label="Any file"><FileInput Slot.Fill="1"/></Field>
+			<Field Label="Images only"><FileInput Placeholder="Choose an image..." Kind="images" Slot.Fill="1"/></Field>
+			<Field Label="Documents"><FileInput Placeholder="PDF, text, Markdown..." Kind="documents" Slot.Fill="1"/></Field>
+			<Field Label="Several files"><FileInput Placeholder="Choose files..." Kind="multi" Slot.Fill="1"/></Field>
+			<Field Label="A folder"><FileInput Placeholder="Choose a folder..." Browse="Choose" Kind="folder" Slot.Fill="1"/></Field>
+			<Field Label="Raven's browser"><FileInput Placeholder="Raven draws this one" Kind="raven" Slot.Fill="1"/></Field>
+			<Label Name="file_path" Text="No file chosen." Opacity="0.6" Wrap="true"/>
+		</VBox>
+	</Demo>
+	<Demo Title="Raven's file browser, embedded" Note="FileBrowser is a widget of Raven: places, folders and files, inside a page.">
+		<FileBrowser Height="320" Directory="~" Controls="false"/>
+	</Demo>
+</Page>

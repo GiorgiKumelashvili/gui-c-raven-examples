@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.nav.breadcrumbs" Title="Breadcrumbs" Subtitle="The path to the current place: links separated by chevrons, the last item is where the user is. When they do not fit, the first ones give their place to an ellipsis. The header of this app uses one.">
+	<Demo Title="Breadcrumb" Note="Click an item to go back to it (Rbreadcrumb_truncate); add more to see the ellipsis.">
+		<Breadcrumb Name="demo_crumbs" Items="Macintosh HD|Users|ada|Projects|raven-app"/>
+		<HBox Spacing="10">
+			<Button Text="Go deeper" OnClicked="crumbs.push"/>
+			<Button Text="Reset" Style="Flat" OnClicked="crumbs.reset"/>
+			<Label Name="crumbs_status" Opacity="0.6" Slot.VAlign="Center"/>
+		</HBox>
+	</Demo>
+	<Demo Title="In little room" Note="Width=&quot;300&quot;: the first items collapse.">
+		<Breadcrumb Width="300" Slot.HAlign="Left" Items="Workspace|Engineering|Platform|Services|Payments|Ledger|Settings"/>
+	</Demo>
+</Page>

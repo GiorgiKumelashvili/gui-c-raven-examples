@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.time.time" Title="Time picker" Subtitle="Hours, minutes and optionally seconds, 24 hours. Click a part to select it; the arrows, the wheel or the digits change it.">
+	<Demo Title="TimePicker">
+		<VBox Spacing="10">
+			<Field Label="Meeting"><TimePicker Time="09:30" OnChanged="time.changed"/></Field>
+			<Field Label="With seconds"><TimePicker Time="14:05:30" ShowSeconds="true" OnChanged="time.changed"/></Field>
+			<Field Label="Steps of 15 min"><TimePicker Time="18:00" MinuteStep="15" OnChanged="time.changed"/></Field>
+			<Label Name="time_status" Text="Change a time" Opacity="0.6"/>
+		</VBox>
+	</Demo>
+</Page>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.choice" Title="Choice &amp; lists" Subtitle="ComboBox drops a list down; ListView shows rows (any number: it can be virtual); Rating chooses with stars.">
+	<Demo Title="ComboBox">
+		<HBox Spacing="12">
+			<ComboBox Items="Helvetica|Inter|SF Pro|JetBrains Mono|Georgia" Selected="2" Width="200"/>
+			<ComboBox Width="200" Selected="0">
+				<Item Text="Ship by air"/>
+				<Item Text="Ship by sea"/>
+				<Item Text="Pick up in store"/>
+			</ComboBox>
+			<ComboBox Items="Disabled" Selected="0" Enabled="false" Width="140"/>
+		</HBox>
+	</Demo>
+	<Demo Title="ListView" Note="Arrow keys move the selection; a double click or Enter activates.">
+		<ListView Height="170" Selected="1" Items="Inbox|Drafts|Sent|Archive|Spam|Trash|Newsletters|Receipts|Travel"/>
+	</Demo>
+	<Demo Title="Rating">
+		<HBox Spacing="16">
+			<Rating Value="3" OnChanged="rating.changed"/>
+			<Rating Value="3.5" AllowHalf="true" StarSize="24" OnChanged="rating.changed"/>
+			<Rating Value="4" ReadOnly="true" Max="5"/>
+			<Label Name="rating_status" Text="Click a star" Opacity="0.6" Slot.VAlign="Center"/>
+		</HBox>
+	</Demo>
+</Page>

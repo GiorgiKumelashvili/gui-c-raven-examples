@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.nav.context" Title="Context menu" Subtitle="Raven's own menus: any Menu without a parent opens as a context menu. Rwidget_set_context_menu attaches one to a widget (right click); Rmenu_open opens it anywhere. They have check items, separators, shortcuts and nested menus. For the menu of macOS itself, see Custom, macOS context menu.">
+	<Demo Title="Right click in the area" Note="Rwidget_set_context_menu(area, menu)">
+		<Border Name="ctx_area" Height="170" CornerRadius="10" BorderWidth="1" Background="#3E63DD18">
+			<VBox Spacing="4" Slot.HAlign="Center" Slot.VAlign="Center">
+				<Label Text="Right click here" TextSize="18" Slot.HAlign="Center"/>
+				<Label Text="(two fingers on a trackpad)" Opacity="0.55" Slot.HAlign="Center"/>
+			</VBox>
+		</Border>
+		<HBox Spacing="10">
+			<Button Text="Open from a button" OnClicked="ctx.open"/>
+			<Label Name="ctx_result" Text="Nothing chosen yet." Opacity="0.6" Slot.VAlign="Center"/>
+		</HBox>
+	</Demo>
+	<Demo Title="On tree rows" Note="Rtree_view_set_context_callback gives the item under the pointer: see Data, Tree.">
+		<Button Text="Go to the tree" Style="Flat" Slot.HAlign="Left" OnClicked="go:data.tree"/>
+	</Demo>
+</Page>

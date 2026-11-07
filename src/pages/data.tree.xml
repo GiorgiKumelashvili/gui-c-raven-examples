@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.data.tree" Title="Tree" Subtitle="TreeView: rows inside rows, virtualized. Items come from XML or from C (Rtree_view_add_item) and can have icons, as in the sidebar. Right click a row for its context menu.">
+	<Demo Title="TreeView" Note="Arrow keys move and fold; drag and drop is available from C (Rtree_view_set_drag_type).">
+		<Checkbox Text="Select several rows (Cmd / Shift + click)" OnChanged="tree.multi"/>
+		<TreeView Name="demo_tree" Height="330">
+			<Item Text="raven-app" Expanded="true">
+				<Item Text="src" Expanded="true">
+					<Item Text="main.c"/>
+					<Item Text="nav.c"/>
+					<Item Text="datatable.c"/>
+					<Item Text="segmented.c"/>
+					<Item Text="pages" Expanded="false">
+						<Item Text="home.xml"/>
+						<Item Text="data.tree.xml"/>
+						<Item Text="custom.datatable.xml"/>
+					</Item>
+					<Item Text="icons">
+						<Item Text="logo.svg"/>
+					</Item>
+				</Item>
+				<Item Text="third_party">
+					<Item Text="Raven">
+						<Item Text="include"/>
+						<Item Text="src"/>
+						<Item Text="docs"/>
+					</Item>
+				</Item>
+				<Item Text="CMakeLists.txt"/>
+				<Item Text="run.sh"/>
+			</Item>
+		</TreeView>
+	</Demo>
+</Page>

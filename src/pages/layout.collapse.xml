@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.collapse" Title="Collapse" Subtitle="Raven's Expander is a header that shows and hides its content. Any widget can also be collapsed by a button with the action toggle:NAME, as Blueprint's Collapse does, with no C.">
+	<Demo Title="Blueprint-style collapse" Note="A button toggles a region (Visibility=&quot;Collapsed&quot; takes no place); Appear=&quot;FlyDown&quot; animates it each time it shows.">
+		<Button Text="Show build logs" Slot.HAlign="Left" OnClicked="toggle:build_logs"/>
+		<Border Name="build_logs" Visibility="Collapsed" Appear="FlyDown" Padding="12" CornerRadius="8" BorderWidth="1">
+			<Label Font="monospace" TextSize="12" Wrap="true"><![CDATA[[09:41:02] Resolving dependencies...
+[09:41:03] Compiling 128 files with clang 17
+[09:41:09] Linking raven_app
+[09:41:10] Build succeeded in 8.2 s]]></Label>
+		</Border>
+	</Demo>
+	<Demo Title="Expander" Note="Expanded sets the first state; OnChanged fires when it opens or closes.">
+		<VBox Spacing="6">
+			<Expander Title="What is Raven?" Expanded="true">
+				<Label Wrap="true" Opacity="0.8" Text="A lightweight, multithreaded GUI library in C for editors and tools. Windows are written in XML and the code in any language."/>
+			</Expander>
+			<Expander Title="Does it run on macOS?">
+				<Label Wrap="true" Opacity="0.8" Text="Yes: Cocoa windows, the menu bar of the system, and Vulkan through MoltenVK."/>
+			</Expander>
+			<Expander Title="Can I nest them?">
+				<VBox Spacing="6">
+					<Label Text="Of course." Opacity="0.8"/>
+					<Expander Title="Inner expander">
+						<Label Text="Turtles all the way down." Opacity="0.8"/>
+					</Expander>
+				</VBox>
+			</Expander>
+		</VBox>
+	</Demo>
+</Page>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.buttons" Title="Buttons" Subtitle="Default, Primary and Flat styles. They squash on press and spring back. A button can hold any one child instead of a text.">
+	<Demo Title="Styles">
+		<HBox Spacing="10">
+			<Button Text="Primary" Style="Primary" OnClicked="say:Primary clicked"/>
+			<Button Text="Default" OnClicked="say:Default clicked"/>
+			<Button Text="Flat" Style="Flat" OnClicked="say:Flat clicked"/>
+			<Button Text="Disabled" Enabled="false"/>
+			<Button Text="Primary disabled" Style="Primary" Enabled="false"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Intents" Note="Color.Accent recolors one button; the theme does the rest (hover, press, text).">
+		<HBox Spacing="10">
+			<Button Text="Success" Style="Primary" Color.Accent="#30A46C" OnClicked="say:Saved"/>
+			<Button Text="Warning" Style="Primary" Color.Accent="#F76B15" OnClicked="say:Careful"/>
+			<Button Text="Danger" Style="Primary" Color.Accent="#E5484D" OnClicked="say:Deleted"/>
+			<Button Text="Violet" Style="Primary" Color.Accent="#8E4EC6"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Sizes" Note="Metric.ControlHeight and TextSize per button.">
+		<HBox Spacing="10">
+			<Button Text="Small" Metric.ControlHeight="22" Metric.FontSize="11" Slot.VAlign="Center"/>
+			<Button Text="Regular" Slot.VAlign="Center"/>
+			<Button Text="Large" Style="Primary" Metric.ControlHeight="40" Metric.FontSize="16" Slot.VAlign="Center"/>
+			<Button Text="Full width" Slot.Fill="1" Slot.VAlign="Center"/>
+		</HBox>
+	</Demo>
+	<Demo Title="With content" Note="A button with one child: an icon and a text.">
+		<HBox Spacing="10">
+			<Button OnClicked="say:Starred">
+				<HBox Spacing="6" Slot.Padding="2,0">
+					<Image Source="../icons/star.svg" Width="14" Height="14" Slot.VAlign="Center"/>
+					<Label Text="Star" Slot.VAlign="Center"/>
+				</HBox>
+			</Button>
+			<Button Style="Primary" OnClicked="say:Downloading">
+				<HBox Spacing="6" Slot.Padding="2,0">
+					<Image Source="../icons/download.svg" Width="14" Height="14" TintText="true" Slot.VAlign="Center"/>
+					<Label Text="Download" Slot.VAlign="Center"/>
+				</HBox>
+			</Button>
+		</HBox>
+	</Demo>
+</Page>

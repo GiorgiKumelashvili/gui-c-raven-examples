@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.text.editor" Title="Code editor" Subtitle="TextEditor: colors for many languages, proposals while typing, brackets and quotes closed, indentation, line numbers, Cmd + wheel to zoom. Edit freely.">
+	<Demo Title="C">
+		<TextEditor Language="C" LineNumbers="true" Height="260"><![CDATA[#include <Raven.h>
+
+static void on_click(Rid sender, const char* action, void* user_data) {
+	Rlabel_set_text(Rwidget_find(g_window, "status"), "Clicked!");
+}
+
+int main(void) {
+	if (!Rinit()) return 1;
+	Raction_bind("counter.click", on_click, NULL);
+	Rid window = Rwindow_create_from_xml_file("main.xml");
+	while (Rwait_frame(-1.0)) {
+	}
+	Rshutdown();
+	return 0;
+}
+]]></TextEditor>
+	</Demo>
+	<Demo Title="Markdown, styled in place">
+		<TextEditor Markdown="true" Height="140" Wrap="true"><![CDATA[# A heading
+Some **strong** and *emphasised* words, `code` and a [link](https://example.com).
+- a list
+- of things
+]]></TextEditor>
+	</Demo>
+</Page>

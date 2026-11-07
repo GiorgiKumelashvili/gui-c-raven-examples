@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.nav.menubar" Title="Menu bar" Subtitle="On macOS, the first MenuBar of a window is shown in the menu bar of the system, at the top of the screen, while the window is active: look up there (File, Edit, View, Go, Window, Help). Elsewhere it is drawn in the window. Native=&quot;false&quot; keeps it in the window everywhere, as below.">
+	<Demo Title="The native menu bar" Note="Shortcuts are those of the system: Super is Command. Try Cmd+1 to Cmd+5 (Go menu), or View, Theme.">
+		<Label Markdown="true" Wrap="true"><![CDATA[
+- **File** - New Window, Open, Open Recent (a sub-menu), Close Window
+- **Edit** - Undo, Redo, Cut, Copy, Paste, Find Component (`Cmd+F`)
+- **View** - Theme (every look of Raven), Toggle Dark / Light, Toggle Sidebar
+- **Go** - jumps to pages, with shortcuts
+- **Help** - opens links with the action `open:URL`
+]]></Label>
+	</Demo>
+	<Demo Title="In the window: Native=&quot;false&quot;" Note="The same widget, drawn by Raven. Menus open on click and slide between each other on hover.">
+		<Border CornerRadius="8" BorderWidth="1" Padding="0">
+			<VBox>
+				<MenuBar Native="false">
+					<Menu Text="File">
+						<MenuItem Text="New" Shortcut="Super+Shift+N" OnClicked="menu.new"/>
+						<MenuItem Text="Open..." OnClicked="menu.open"/>
+						<Separator/>
+						<MenuItem Text="Export" OnClicked="menu.export"/>
+					</Menu>
+					<Menu Text="Format">
+						<MenuItem Text="Bold" Checkable="true" Checked="true" OnClicked="menu.bold"/>
+						<MenuItem Text="Italic" Checkable="true" OnClicked="menu.italic"/>
+						<Separator/>
+						<Menu Text="Align">
+							<MenuItem Text="Left" OnClicked="menu.left"/>
+							<MenuItem Text="Center" OnClicked="menu.center"/>
+							<MenuItem Text="Right" OnClicked="menu.right"/>
+						</Menu>
+					</Menu>
+					<Menu Text="Help">
+						<MenuItem Text="About" OnClicked="menu.about"/>
+					</Menu>
+				</MenuBar>
+				<Label Text="Document area" Opacity="0.5" Slot.Padding="16,40" Slot.HAlign="Center"/>
+			</VBox>
+		</Border>
+	</Demo>
+</Page>

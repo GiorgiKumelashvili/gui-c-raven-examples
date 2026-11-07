@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.overlay.toast" Title="Toast" Subtitle="A short message that rises over the content and goes. Four kinds, an optional button (Undo), and three ways to queue: replace, one after the other, or stacked.">
+	<Demo Title="Kinds">
+		<HBox Spacing="10">
+			<Button Text="Info" OnClicked="toast.info"/>
+			<Button Text="Success" OnClicked="toast.success"/>
+			<Button Text="Warning" OnClicked="toast.warning"/>
+			<Button Text="Error" OnClicked="toast.error"/>
+			<Button Text="With Undo" Style="Primary" OnClicked="toast.action"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Queue" Note="Send three at once, with each mode.">
+		<HBox Spacing="10">
+			<ComboBox Name="toast_queue" Items="Replace|Sequence|Stack" Selected="2" OnChanged="toast.queue" Width="140"/>
+			<Button Text="Send a burst of 3" OnClicked="toast.burst"/>
+			<Button Text="Clear" Style="Flat" OnClicked="toast.clear"/>
+		</HBox>
+	</Demo>
+</Page>

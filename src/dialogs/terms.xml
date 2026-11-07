@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A long dialog: its text scrolls. -->
+<Border Padding="22" CornerRadius="14" Width="520" Height="440">
+	<VBox Spacing="12">
+		<Label Text="Terms of service" TextSize="20"/>
+		<ScrollBox Slot.Fill="1">
+			<Label Markdown="true" Wrap="true"><![CDATA[
+## 1. Acceptance
+By using Raven Components you agree to be delighted by springs.
+
+## 2. Widgets
+Widgets are provided as they are. They may bounce, squash, fly in or pop out of what opened them.
+
+## 3. Themes
+You may wear any look: macOS, Windows 11, GNOME or Raven, dark or light, solid or glass.
+
+## 4. Live reload
+Saving an XML file while the app runs changes the window. This is a feature.
+
+## 5. Data
+No data leaves your computer. The data table is made up; the people in it are famous.
+
+## 6. Termination
+Press Escape at any time.
+]]></Label>
+		</ScrollBox>
+		<HBox Spacing="8" Slot.HAlign="Right">
+			<Button Text="Decline" OnClicked="modal.cancel"/>
+			<Button Text="Accept" Style="Primary" OnClicked="modal.accept"/>
+		</HBox>
+	</VBox>
+</Border>

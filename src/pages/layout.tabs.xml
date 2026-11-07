@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.tabs" Title="Tabs" Subtitle="TabView: one tab per child, titled by Slot.Title. page:NAME=+1 turns the tab from any button.">
+	<Demo Title="TabView">
+		<TabView Name="demo_tabs" Height="220">
+			<VBox Slot.Title="General" Spacing="10" Slot.Padding="16">
+				<Field Label="Name"><TextInput Text="Raven Components" Slot.Fill="1"/></Field>
+				<Field Label="Launch at login"><Checkbox Style="Switch" Checked="true"/></Field>
+			</VBox>
+			<VBox Slot.Title="Appearance" Spacing="10" Slot.Padding="16">
+				<Field Label="Theme"><ComboBox Items="Automatic|Light|Dark" Selected="0" Slot.Fill="1"/></Field>
+				<Field Label="Text size"><Slider Value="0.5" Slot.Fill="1"/></Field>
+			</VBox>
+			<VBox Slot.Title="Advanced" Spacing="10" Slot.Padding="16">
+				<Checkbox Text="Enable live reload" Checked="true"/>
+				<Checkbox Text="Show the widget inspector"/>
+			</VBox>
+		</TabView>
+		<HBox Spacing="8">
+			<Button Text="Previous tab" OnClicked="page:demo_tabs=-1"/>
+			<Button Text="Next tab" OnClicked="page:demo_tabs=+1"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Switcher: tabs without tabs" Note="A Switcher shows one child; the buttons drive it with page:NAME=N, no C.">
+		<HBox Spacing="8">
+			<Button Text="Step 1" OnClicked="page:steps=0"/>
+			<Button Text="Step 2" OnClicked="page:steps=1"/>
+			<Button Text="Step 3" OnClicked="page:steps=2"/>
+		</HBox>
+		<Switcher Name="steps">
+			<Block Text="Create an account" Color="#3E63DD"/>
+			<Block Text="Choose a plan" Color="#8E4EC6"/>
+			<Block Text="Invite the team" Color="#30A46C"/>
+		</Switcher>
+	</Demo>
+</Page>

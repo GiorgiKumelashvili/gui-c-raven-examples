@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.numbers" Title="Numbers &amp; sliders" Subtitle="Slider, SpinBox and ProgressBar. Sliders can step and stand up.">
+	<Demo Title="Slider">
+		<VBox Spacing="10">
+			<Field Label="Volume"><Slider Value="0.65" OnChanged="slider.changed" Slot.Fill="1"/></Field>
+			<Field Label="Steps of 10"><Slider Min="0" Max="100" Step="10" Value="40" Slot.Fill="1"/></Field>
+			<Field Label="Disabled"><Slider Value="0.3" Enabled="false" Slot.Fill="1"/></Field>
+			<Label Name="slider_status" Text="Volume: 65%" Opacity="0.6"/>
+		</VBox>
+	</Demo>
+	<Demo Title="Vertical sliders" Note="Orientation=&quot;Vertical&quot;, made with Repeat.">
+		<HBox Spacing="18" Height="150">
+			<Repeat Count="10" Var="i">
+				<Slider Orientation="Vertical" Value="{0.3 + ((i * 37) % 60) / 100}"/>
+			</Repeat>
+		</HBox>
+	</Demo>
+	<Demo Title="SpinBox">
+		<HBox Spacing="12">
+			<Field Label="Quantity" LabelWidth="70"><SpinBox Min="0" Max="99" Value="3" Width="110"/></Field>
+			<Field Label="Price" LabelWidth="50"><SpinBox Min="0" Max="1000" Value="19.99" Step="0.5" Decimals="2" Width="130"/></Field>
+			<Field Label="Opacity" LabelWidth="60"><SpinBox Min="0" Max="1" Value="0.8" Step="0.05" Decimals="2" Width="120"/></Field>
+		</HBox>
+	</Demo>
+</Page>

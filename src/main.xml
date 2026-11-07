@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Raven Components - the window.
+
+  Menu bar (on macOS: the menu bar of the system), a sidebar that can be
+  resized (Splitter) with the tree of components, and the pages in a
+  Switcher. Over everything: the layer of the popover and the toast.
+  Save this file, or a page, while the app runs: the window follows.
+-->
+<Window Title="Raven Components" Width="1320" Height="840" MinWidth="900" MinHeight="560">
+	<Include Source="widgets.xml"/>
+
+	<Shortcut Keys="Super+F" Action="focus:nav_filter"/>
+	<Shortcut Keys="Super+Alt+S" Action="toggle:sidebar"/>
+
+	<Overlay>
+		<VBox>
+			<!-- on macOS this is the menu bar at the top of the screen; elsewhere it is drawn here -->
+			<MenuBar>
+				<Menu Text="File">
+					<MenuItem Text="New Window" Shortcut="Super+N" OnClicked="menu.new"/>
+					<MenuItem Text="Open..." Shortcut="Super+O" OnClicked="menu.open"/>
+					<Menu Text="Open Recent">
+						<MenuItem Text="dashboard.xml" OnClicked="menu.recent"/>
+						<MenuItem Text="settings.xml" OnClicked="menu.recent"/>
+						<Separator/>
+						<MenuItem Text="Clear Menu" OnClicked="menu.clear"/>
+					</Menu>
+					<Separator/>
+					<MenuItem Text="Close Window" Shortcut="Super+W" OnClicked="window.close"/>
+				</Menu>
+				<Menu Text="Edit">
+					<MenuItem Text="Undo" Shortcut="Super+Z" OnClicked="menu.undo"/>
+					<MenuItem Text="Redo" Shortcut="Super+Shift+Z" OnClicked="menu.redo"/>
+					<Separator/>
+					<MenuItem Text="Cut" Shortcut="Super+X" OnClicked="menu.cut"/>
+					<MenuItem Text="Copy" Shortcut="Super+C" OnClicked="menu.copy"/>
+					<MenuItem Text="Paste" Shortcut="Super+V" OnClicked="menu.paste"/>
+					<Separator/>
+					<MenuItem Text="Find Component" Shortcut="Super+F" OnClicked="focus:nav_filter"/>
+				</Menu>
+				<Menu Text="View">
+					<Menu Text="Theme">
+						<MenuItem Text="macOS Dark" OnClicked="theme:MacOSDark"/>
+						<MenuItem Text="macOS Light" OnClicked="theme:MacOSLight"/>
+						<MenuItem Text="macOS Liquid Glass Dark" OnClicked="theme:MacOSGlassDark"/>
+						<MenuItem Text="macOS Liquid Glass Light" OnClicked="theme:MacOSGlassLight"/>
+						<Separator/>
+						<MenuItem Text="Raven Dark" OnClicked="theme:RavenDark"/>
+						<MenuItem Text="Raven Light" OnClicked="theme:RavenLight"/>
+						<Separator/>
+						<MenuItem Text="Windows 11 Dark" OnClicked="theme:WindowsDark"/>
+						<MenuItem Text="Windows 11 Light" OnClicked="theme:WindowsLight"/>
+						<MenuItem Text="GNOME Dark" OnClicked="theme:GnomeDark"/>
+						<MenuItem Text="GNOME Light" OnClicked="theme:GnomeLight"/>
+					</Menu>
+					<MenuItem Text="Toggle Dark / Light" Shortcut="Super+Shift+L" OnClicked="theme.toggle"/>
+					<Separator/>
+					<MenuItem Text="Toggle Sidebar" Shortcut="Super+Alt+S" OnClicked="toggle:sidebar"/>
+				</Menu>
+				<Menu Text="Go">
+					<MenuItem Text="Welcome" Shortcut="Super+1" OnClicked="go:home"/>
+					<MenuItem Text="Data Table" Shortcut="Super+2" OnClicked="go:custom.datatable"/>
+					<MenuItem Text="Segmented Control" Shortcut="Super+3" OnClicked="go:custom.segmented"/>
+					<MenuItem Text="macOS Context Menu" Shortcut="Super+4" OnClicked="go:custom.nativemenu"/>
+					<MenuItem Text="Node Graph" Shortcut="Super+5" OnClicked="go:tools.nodes"/>
+				</Menu>
+				<Menu Text="Window">
+					<MenuItem Text="Minimize" Shortcut="Super+M" OnClicked="window.minimize"/>
+					<MenuItem Text="Zoom" OnClicked="window.maximize"/>
+				</Menu>
+				<Menu Text="Help">
+					<MenuItem Text="Raven on GitHub" OnClicked="open:https://github.com/oscar-soirey/Raven"/>
+					<MenuItem Text="Raven Website" OnClicked="open:https://oscar-soirey.github.io/Raven/"/>
+				</Menu>
+			</MenuBar>
+
+			<Splitter Slot.Fill="1" MinPaneSize="210">
+				<!-- the sidebar -->
+				<Border Name="sidebar" Slot.Fill="0.23" Padding="0" CornerRadius="0">
+					<VBox Spacing="8">
+						<HBox Spacing="11" Slot.Padding="16,16,16,6">
+							<Image Source="icons/logo.svg" Width="32" Height="32" Slot.VAlign="Center"/>
+							<VBox Spacing="1" Slot.VAlign="Center">
+								<Label Text="Raven Components" TextSize="15"/>
+								<Label Text="What Raven can do" TextSize="11" Opacity="0.55"/>
+							</VBox>
+						</HBox>
+						<TextInput Name="nav_filter" Placeholder="Filter components  (Cmd+F)" Slot.Padding="12,2"/>
+						<TreeView Name="nav" Slot.Fill="1" Slot.Padding="6,0,6,0"/>
+						<Separator/>
+						<HBox Spacing="6" Slot.Padding="12,2,12,10">
+							<Label Text="Raven native  /  custom" TextSize="11" Opacity="0.5" Slot.Fill="1" Slot.VAlign="Center"/>
+							<Button Text="Light / Dark" Style="Flat" OnClicked="theme.toggle" Tooltip="Toggles the dark and light variant of the look"/>
+						</HBox>
+					</VBox>
+				</Border>
+
+				<!-- the content -->
+				<VBox Slot.Fill="0.77">
+					<HBox Spacing="8" Slot.Padding="16,10,16,10">
+						<Button Text="Sidebar" Style="Flat" OnClicked="toggle:sidebar" Tooltip="Show or hide the sidebar (Cmd+Alt+S)"/>
+						<Breadcrumb Name="crumbs" Items="Components" Slot.Fill="1" Slot.VAlign="Center"/>
+						<Button Text="GitHub" Style="Flat" OnClicked="open:https://github.com/oscar-soirey/Raven"/>
+					</HBox>
+					<Separator/>
+					<Switcher Name="pages" Slot.Fill="1">
+						<Include Source="pages/home.xml"/>
+						<Include Source="pages/themes.xml"/>
+
+						<Include Source="pages/layout.boxes.xml"/>
+						<Include Source="pages/layout.splitter.xml"/>
+						<Include Source="pages/layout.tabs.xml"/>
+						<Include Source="pages/layout.collapse.xml"/>
+						<Include Source="pages/layout.dock.xml"/>
+						<Include Source="pages/layout.surfaces.xml"/>
+
+						<Include Source="pages/input.buttons.xml"/>
+						<Include Source="pages/input.checks.xml"/>
+						<Include Source="pages/input.text.xml"/>
+						<Include Source="pages/input.numbers.xml"/>
+						<Include Source="pages/input.choice.xml"/>
+						<Include Source="pages/input.color.xml"/>
+
+						<Include Source="pages/nav.menubar.xml"/>
+						<Include Source="pages/nav.context.xml"/>
+						<Include Source="pages/nav.breadcrumbs.xml"/>
+						<Include Source="pages/nav.pagination.xml"/>
+
+						<Include Source="pages/data.tree.xml"/>
+						<Include Source="pages/data.table.xml"/>
+
+						<Include Source="pages/time.date.xml"/>
+						<Include Source="pages/time.time.xml"/>
+
+						<Include Source="pages/overlay.alert.xml"/>
+						<Include Source="pages/overlay.modal.xml"/>
+						<Include Source="pages/overlay.toast.xml"/>
+						<Include Source="pages/overlay.tooltip.xml"/>
+						<Include Source="pages/overlay.progress.xml"/>
+
+						<Include Source="pages/text.markdown.xml"/>
+						<Include Source="pages/text.editor.xml"/>
+
+						<Include Source="pages/tools.nodes.xml"/>
+						<Include Source="pages/tools.timeline.xml"/>
+
+						<Include Source="pages/custom.nativemenu.xml"/>
+						<Include Source="pages/custom.datatable.xml"/>
+						<Include Source="pages/custom.buttongroup.xml"/>
+						<Include Source="pages/custom.segmented.xml"/>
+						<Include Source="pages/custom.popover.xml"/>
+						<Include Source="pages/custom.fileinput.xml"/>
+					</Switcher>
+				</VBox>
+			</Splitter>
+		</VBox>
+
+		<!-- the popover (custom): a Canvas lets the mouse through where it has no child -->
+		<Canvas Name="popover_layer">
+			<Border Name="popover" Visibility="Collapsed" Width="290" Padding="16" CornerRadius="12" BorderWidth="1" Shadow="28,0,10" Appear="Pop">
+				<VBox>
+					<VBox Name="share" Spacing="10">
+						<Label Text="Share &quot;Q3 roadmap&quot;" TextSize="15"/>
+						<TextInput Text="https://raven.app/s/q3-roadmap" ReadOnly="true"/>
+						<HBox Spacing="8">
+							<Checkbox Text="Anyone with the link" Style="Switch" Checked="true" Slot.Fill="1" Slot.VAlign="Center"/>
+						</HBox>
+						<HBox Spacing="8" Slot.HAlign="Right">
+							<Button Text="Copy link" OnClicked="copy:https://raven.app/s/q3-roadmap"/>
+							<Button Text="Done" Style="Primary" OnClicked="popover.close"/>
+						</HBox>
+					</VBox>
+					<VBox Name="filters" Spacing="10">
+						<Label Text="Filters" TextSize="15"/>
+						<Checkbox Text="Only open issues" Checked="true"/>
+						<Checkbox Text="Assigned to me"/>
+						<Checkbox Text="Has attachments"/>
+						<Field Label="Priority" LabelWidth="70"><ComboBox Items="Any|P0|P1|P2|P3" Selected="0" Slot.Fill="1"/></Field>
+						<Field Label="Updated" LabelWidth="70"><DatePicker Date="Today" Slot.Fill="1"/></Field>
+						<HBox Spacing="8" Slot.HAlign="Right">
+							<Button Text="Reset" Style="Flat" OnClicked="say:Filters reset"/>
+							<Button Text="Apply" Style="Primary" OnClicked="popover.close"/>
+						</HBox>
+					</VBox>
+					<VBox Name="profile" Spacing="10">
+						<HBox Spacing="10">
+							<Border Background="#8E4EC6" CornerRadius="100" Width="40" Height="40">
+								<Label Text="AL" Color="white" Slot.HAlign="Center" Slot.VAlign="Center"/>
+							</Border>
+							<VBox Spacing="1" Slot.VAlign="Center">
+								<Label Text="Ada Lovelace" TextSize="15"/>
+								<Label Text="ada@analytical.engine" Opacity="0.6" TextSize="12"/>
+							</VBox>
+						</HBox>
+						<Separator/>
+						<Field Label="Status" LabelWidth="60"><ComboBox Items="Available|Busy|Away" Selected="0" Slot.Fill="1"/></Field>
+						<Rating Value="4" StarSize="16"/>
+						<Button Text="Sign out" Style="Flat" OnClicked="say:Signed out"/>
+					</VBox>
+				</VBox>
+			</Border>
+		</Canvas>
+
+		<Toast Name="toast" Queue="Stack" MaxVisible="3" Slot.HAlign="Center" Slot.VAlign="Bottom" Slot.Padding="24"/>
+	</Overlay>
+</Window>

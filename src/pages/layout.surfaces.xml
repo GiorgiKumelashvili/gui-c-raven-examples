@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.surfaces" Title="Surfaces &amp; effects" Subtitle="Border draws a surface: color, outline, corners, shadow, or a shader effect as its background. BackgroundBlur shows what is behind it out of focus.">
+	<Demo Title="Effects" Note="Border Effect=&quot;...&quot;: built-in shaders, animated, following the pointer. Move the mouse over them.">
+		<UniformGrid Columns="3" Spacing="12">
+			<Border Effect="aurora" CornerRadius="14" Height="130"><Label Text="aurora" Color="white" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+			<Border Effect="mesh" CornerRadius="14" Height="130"><Label Text="mesh" Color="white" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+			<Border Effect="plasma" CornerRadius="14" Height="130"><Label Text="plasma" Color="white" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+			<Border Effect="shimmer" CornerRadius="14" Height="130"><Label Text="shimmer" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+			<Border Effect="spotlight" CornerRadius="14" Height="130"><Label Text="spotlight" Color="white" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+			<Border Effect="neon" CornerRadius="14" Height="130" Background="#16161A"><Label Text="neon" Color="white" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="12"/></Border>
+		</UniformGrid>
+	</Demo>
+	<Demo Title="Corners, outlines, shadows">
+		<HBox Spacing="18" Height="110">
+			<Border Width="120" CornerRadius="0" BorderWidth="1"><Label Text="square" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Width="120" CornerRadius="16" BorderWidth="2" BorderColor="#3E63DD"><Label Text="outline" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Width="120" CornerRadius="24,4,24,4" Background="#8E4EC6"><Label Text="4 corners" Color="white" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Width="120" CornerRadius="16" Shadow="24,0,8"><Label Text="shadow" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Width="110" CornerRadius="100" Background="#30A46C"><Label Text="circle" Color="white" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+		</HBox>
+	</Demo>
+	<Demo Title="Background blur" Note="A frosted panel over a colorful surface.">
+		<Overlay Height="170">
+			<Border Effect="mesh" CornerRadius="14"/>
+			<BackgroundBlur Style="Frosted" CornerRadius="14" Padding="18" Slot.HAlign="Center" Slot.VAlign="Center" Width="320">
+				<VBox Spacing="4">
+					<Label Text="Frosted glass" TextSize="18"/>
+					<Label Text="What is behind is blurred, veiled and grained." Opacity="0.75" Wrap="true"/>
+				</VBox>
+			</BackgroundBlur>
+		</Overlay>
+	</Demo>
+</Page>

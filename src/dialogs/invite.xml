@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Shown by Rdialog_open (demos.c). Its buttons close it with Rdialog_close. -->
+<Border Padding="22" CornerRadius="14" Width="420">
+	<VBox Spacing="14">
+		<VBox Spacing="4">
+			<Label Text="Invite a teammate" TextSize="20"/>
+			<Label Text="They will get an email with a link to join the workspace." Wrap="true" Opacity="0.65"/>
+		</VBox>
+		<VBox Spacing="6">
+			<Label Text="Email" Opacity="0.75"/>
+			<TextInput Name="invite_email" Placeholder="grace@navy.mil"/>
+		</VBox>
+		<VBox Spacing="6">
+			<Label Text="Role" Opacity="0.75"/>
+			<ComboBox Name="invite_role" Items="Viewer|Editor|Admin" Selected="1"/>
+		</VBox>
+		<Checkbox Text="Send a copy to me" Style="Switch"/>
+		<HBox Spacing="8" Slot.HAlign="Right">
+			<Button Text="Cancel" OnClicked="modal.cancel"/>
+			<Button Text="Send invite" Style="Primary" OnClicked="modal.ok"/>
+		</HBox>
+	</VBox>
+</Border>

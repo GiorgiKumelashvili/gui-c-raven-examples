@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.overlay.modal" Title="Modal" Subtitle="Rdialog_open shows any widget as a dialog of the window: here, documents of src/dialogs. Rdialog_close(button, result) closes the dialog holding the button; Escape dismisses it.">
+	<Demo Title="Rdialog_open">
+		<HBox Spacing="10">
+			<Button Text="Invite a teammate..." Style="Primary" OnClicked="modal.open.form"/>
+			<Button Text="Terms of service..." OnClicked="modal.open.terms"/>
+		</HBox>
+		<Label Name="modal_result" Text="No dialog closed yet." Opacity="0.6"/>
+	</Demo>
+</Page>

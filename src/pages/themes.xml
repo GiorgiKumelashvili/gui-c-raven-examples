@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.themes" Title="Themes &amp; looks" Subtitle="Raven imitates the controls of the systems closely: their colors, accent, metrics, fonts and motion. A look can be worn by the whole app (View, Theme in the menu bar, or theme:NAME as an action) or by one part of a window (Theme= on any widget), as each card below does.">
+	<UniformGrid Columns="2" Spacing="14">
+		<LookPreview Look="MacOSDark" Caption="macOS Dark"/>
+		<LookPreview Look="MacOSLight" Caption="macOS Light"/>
+		<LookPreview Look="MacOSGlassDark" Caption="macOS 26 Liquid Glass Dark"/>
+		<LookPreview Look="MacOSGlassLight" Caption="macOS 26 Liquid Glass Light"/>
+		<LookPreview Look="WindowsDark" Caption="Windows 11 Dark"/>
+		<LookPreview Look="WindowsLight" Caption="Windows 11 Light"/>
+		<LookPreview Look="GnomeDark" Caption="GNOME Dark"/>
+		<LookPreview Look="GnomeLight" Caption="GNOME Light"/>
+		<LookPreview Look="RavenDark" Caption="Raven Dark"/>
+		<LookPreview Look="RavenLight" Caption="Raven Light"/>
+	</UniformGrid>
+	<Demo Title="Overriding one color" Note="Color.ROLE and Metric.NAME change the theme for one widget and what it contains.">
+		<HBox Spacing="10">
+			<Button Text="Delete" Style="Primary" Color.Accent="#E5484D"/>
+			<Button Text="Publish" Style="Primary" Color.Accent="#30A46C"/>
+			<Button Text="Square" Metric.CornerRadius="0"/>
+			<Button Text="Pill" Metric.CornerRadius="100"/>
+			<Checkbox Text="Orange switch" Style="Switch" Checked="true" Color.Accent="#F76B15" Slot.VAlign="Center"/>
+		</HBox>
+	</Demo>
+</Page>

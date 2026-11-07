@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.dock" Title="Dock area" Subtitle="Panels the user rearranges by dragging their tabs: to a side, into another group, or out of the window. The first child fills the area; the others are placed around it.">
+	<Demo Title="DockArea" Note="Drag a tab to another edge, or onto another panel.">
+		<DockArea Height="380">
+			<Border Name="dock_scene" Slot.Title="Scene" Background="#3E63DD20"><Label Text="Scene" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<TreeView Name="dock_outliner" Slot.Title="Outliner" Slot.Dock="Left" Slot.DockSize="0.25">
+				<Item Text="World" Expanded="true">
+					<Item Text="Camera"/>
+					<Item Text="Sun"/>
+					<Item Text="Terrain"/>
+				</Item>
+			</TreeView>
+			<VBox Name="dock_props" Slot.Title="Properties" Slot.Dock="Right" Slot.DockSize="0.28" Spacing="8" Slot.Padding="10">
+				<Field Label="X" LabelWidth="30"><SpinBox Value="12.5" Decimals="1" Slot.Fill="1"/></Field>
+				<Field Label="Y" LabelWidth="30"><SpinBox Value="4" Decimals="1" Slot.Fill="1"/></Field>
+				<Checkbox Text="Visible" Checked="true"/>
+			</VBox>
+			<Label Name="dock_log" Slot.Title="Console" Slot.Dock="Bottom" Slot.DockSize="0.3" Font="monospace" TextSize="12" Text="> ready" Slot.Padding="8"/>
+			<Label Name="dock_assets" Slot.Title="Assets" Slot.Dock="Tab" Slot.DockTo="dock_log" Text="12 textures, 4 meshes" Slot.Padding="8"/>
+		</DockArea>
+	</Demo>
+</Page>

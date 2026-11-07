@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.nav.pagination" Title="Pagination" Subtitle="Page numbers with previous and next. Pages are counted from 0 and shown from 1.">
+	<Demo Title="Pagination">
+		<Pagination PageCount="20" Page="4" OnChanged="page.changed"/>
+		<Label Name="page_status" Text="Showing page 5 of 20" Opacity="0.6"/>
+	</Demo>
+	<Demo Title="Siblings" Note="How many numbers on each side of the current page.">
+		<VBox Spacing="10">
+			<Pagination PageCount="50" Page="24" Siblings="0"/>
+			<Pagination PageCount="50" Page="24" Siblings="2"/>
+			<Pagination PageCount="5" Page="0"/>
+		</VBox>
+	</Demo>
+</Page>

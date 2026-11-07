@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.segmented" Kind="Custom" Title="Segmented control" Subtitle="Painted by the app (src/segmented.c) and registered as &lt;SegmentedControl&gt; with Rxml_register_tag. The thumb slides on a spring (Rdraw_spring), as Raven's own controls move. It takes the keyboard focus: Left and Right change the choice.">
+	<Demo Title="Switching views" Note="OnChanged drives a Switcher.">
+		<SegmentedControl Items="List|Board|Calendar|Timeline" Selected="0" OnChanged="seg.view" Slot.HAlign="Left"/>
+		<Switcher Name="seg_views">
+			<Block Text="List view" Color="#3E63DD"/>
+			<Block Text="Board view" Color="#8E4EC6"/>
+			<Block Text="Calendar view" Color="#12A594"/>
+			<Block Text="Timeline view" Color="#F76B15"/>
+		</Switcher>
+		<Label Name="seg_status" Text="Selected: List (index 0)" Opacity="0.6"/>
+	</Demo>
+	<Demo Title="Variants">
+		<VBox Spacing="12">
+			<Field Label="Default"><SegmentedControl Items="Day|Week|Month|Year" Selected="1" OnChanged="seg.changed"/></Field>
+			<Field Label="Intent Primary"><SegmentedControl Items="Light|Dark|Auto" Selected="2" Intent="Primary" OnChanged="seg.changed"/></Field>
+			<Field Label="Large"><SegmentedControl Items="Small|Medium|Large" Selected="0" Large="true" OnChanged="seg.changed"/></Field>
+			<Field Label="Fill"><SegmentedControl Items="Overview|Activity|Settings" Selected="0" Slot.Fill="1" OnChanged="seg.changed"/></Field>
+		</VBox>
+	</Demo>
+</Page>

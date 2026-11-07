@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.home" Title="Raven Components" Subtitle="Every widget Raven ships with, one page each, and a few built here on top of it. Pages tagged RAVEN use only what the library gives; pages tagged CUSTOM are made in this app, painted with Raven's drawing API or composed from its widgets. Every page is an XML file in src/pages: save one while the app runs and it reloads.">
+	<Border Effect="aurora" EffectColor="#3E63DD" EffectColor2="#8E4EC6" CornerRadius="16" Height="180">
+		<VBox Spacing="4" Slot.HAlign="Left" Slot.VAlign="Bottom" Slot.Padding="24">
+			<Label Text="C11  -  XML  -  Vulkan  -  springs everywhere" TextSize="13" Color="white" Opacity="0.85"/>
+			<Label Text="What can Raven do?" TextSize="32" Color="white"/>
+		</VBox>
+	</Border>
+
+	<Label Text="Start here" TextSize="18"/>
+	<UniformGrid Columns="3" Spacing="12">
+		<QuickLink Title="Data table" Text="Custom: check rows, unfold them, drag column edges, colored tiles." Go="custom.datatable"/>
+		<QuickLink Title="macOS context menu" Text="Custom: a real NSMenu with SF Symbols, opened over Raven." Go="custom.nativemenu"/>
+		<QuickLink Title="Segmented control" Text="Custom: painted, with a thumb on a spring." Go="custom.segmented"/>
+		<QuickLink Title="Themes &amp; looks" Text="macOS, Liquid Glass, Windows 11, GNOME and Raven, side by side." Go="themes"/>
+		<QuickLink Title="Node graph" Text="Nodes, typed pins, wires that hang and swing." Go="tools.nodes"/>
+		<QuickLink Title="Surfaces &amp; effects" Text="Shader backgrounds, blur, glass and shadows." Go="layout.surfaces"/>
+	</UniformGrid>
+
+	<Label Text="What is where" TextSize="18"/>
+	<Label Markdown="true" Wrap="true"><![CDATA[
+| Asked for | Where | How |
+|---|---|---|
+| Native macOS context menu | Custom | NSMenu from the NSWindow Raven gives (`Rwindow_get_native_handle`) |
+| Raven context menu | Navigation | `Rwidget_set_context_menu`, `Rmenu_open` |
+| Data table (toggle rows, resizable columns, colored tiles) | Custom | `<DataTable>`: a CUSTOM widget painted with `Rdraw_*` |
+| Button group | Custom | `<ButtonGroup>`: a tag declared in XML |
+| Breadcrumbs | Navigation | `<Breadcrumb>` |
+| Collapse | Layout | `<Expander>`, and `toggle:NAME` on any widget |
+| Tree | Data | `<TreeView>` |
+| Segmented control | Custom | `<SegmentedControl>`: painted, registered with `Rxml_register_tag` |
+| File input | Custom | `<FileInput>`: declared tag + `Rfile_dialog_open` |
+| Alert | Overlays | `Rmessage_box` |
+| Modal | Overlays | `Rdialog_open` with any XML |
+| Popover | Custom | a Canvas layer over the window, placed under its anchor |
+| Toast | Overlays | `<Toast>` |
+| Tooltip | Overlays | `Tooltip=` on any widget |
+| Date picker | Date & time | `<DatePicker>` |
+]]></Label>
+</Page>

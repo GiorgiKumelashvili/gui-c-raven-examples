@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.popover" Kind="Custom" Title="Popover" Subtitle="Raven has popups for its menus, lists and pickers, but no popover holding any widget. Here: a Canvas laid over the window (main.xml, popover_layer) holds a Border whose contents are chosen by name; src/popover.c places it under the button that opened it, kept inside the window. A click elsewhere or Escape closes it.">
+	<Demo Title="Popovers" Note="The contents are ordinary widgets: inputs, switches, combo boxes, even a date picker.">
+		<HBox Spacing="10">
+			<Button Name="pop_share" Text="Share..." Style="Primary" OnClicked="popover:share"/>
+			<Button Name="pop_filters" Text="Filters" OnClicked="popover:filters"/>
+			<Spacer Slot.Fill="1"/>
+			<Button Name="pop_profile" Text="Profile" OnClicked="popover:profile"/>
+		</HBox>
+	</Demo>
+</Page>

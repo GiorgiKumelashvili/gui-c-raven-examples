@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.time.date" Title="Date picker" Subtitle="A date field with a calendar that drops down. Months are named in the language of the app; the format, the first day of the week and the range are attributes.">
+	<Demo Title="DatePicker">
+		<VBox Spacing="10">
+			<Field Label="Today"><DatePicker Date="Today" OnChanged="date.changed" Width="220"/></Field>
+			<Field Label="Long format"><DatePicker Date="2026-11-07" Format="dddd, D MMMM YYYY" OnChanged="date.changed" Width="260"/></Field>
+			<Field Label="Weeks from Monday"><DatePicker Date="2026-12-24" FirstDayOfWeek="Monday" OnChanged="date.changed" Width="220"/></Field>
+			<Field Label="Only this month"><DatePicker Date="2026-11-15" Min="2026-11-01" Max="2026-11-30" OnChanged="date.changed" Width="220"/></Field>
+			<Label Name="date_status" Text="Pick a date" Opacity="0.6"/>
+		</VBox>
+	</Demo>
+</Page>

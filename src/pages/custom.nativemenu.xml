@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.nativemenu" Kind="Custom" Title="macOS context menu" Subtitle="Raven draws its own menus everywhere. This one is the menu of macOS itself (NSMenu): its blur, font, keyboard navigation and SF Symbols. Raven gives the NSWindow (Rwindow_get_native_handle); src/native_menu_macos.m pops the menu up in its content view and returns the item chosen. On other systems the app falls back to Raven's menu.">
+	<HBox Spacing="14">
+		<Demo Title="System menu (NSMenu)" Note="Right click in the area." Slot.Fill="1">
+			<Border Name="native_area" Height="190" CornerRadius="10" BorderWidth="1" Background="#F76B1518">
+				<VBox Spacing="4" Slot.HAlign="Center" Slot.VAlign="Center">
+					<Label Text="Right click here" TextSize="18" Slot.HAlign="Center"/>
+					<Label Text="native macOS menu" Opacity="0.55" Slot.HAlign="Center"/>
+				</VBox>
+			</Border>
+			<HBox Spacing="10">
+				<Button Text="Open below this button" OnClicked="native.open"/>
+				<Label Name="native_result" Text="Nothing chosen yet." Opacity="0.6" Slot.VAlign="Center"/>
+			</HBox>
+		</Demo>
+		<Demo Title="Raven menu, to compare" Note="Right click: Rwidget_set_context_menu." Slot.Fill="1">
+			<Border Name="ctx_area_compare" Height="190" CornerRadius="10" BorderWidth="1" Background="#3E63DD18">
+				<VBox Spacing="4" Slot.HAlign="Center" Slot.VAlign="Center">
+					<Label Text="Right click here" TextSize="18" Slot.HAlign="Center"/>
+					<Label Text="Raven's menu" Opacity="0.55" Slot.HAlign="Center"/>
+				</VBox>
+			</Border>
+			<Button Text="See the Raven page" Style="Flat" Slot.HAlign="Left" OnClicked="go:nav.context"/>
+		</Demo>
+	</HBox>
+</Page>

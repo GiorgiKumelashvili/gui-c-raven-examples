@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.overlay.alert" Title="Alert" Subtitle="Rmessage_box shows a message with buttons over the window and waits for the answer: OK, OK / Cancel, Yes / No, Yes / No / Cancel. Escape dismisses it.">
+	<Demo Title="Rmessage_box">
+		<HBox Spacing="10">
+			<Button Text="Information" OnClicked="alert.info"/>
+			<Button Text="Confirm" OnClicked="alert.confirm"/>
+			<Button Text="Destructive" Style="Primary" Color.Accent="#E5484D" OnClicked="alert.danger"/>
+			<Button Text="Save changes?" OnClicked="alert.save"/>
+		</HBox>
+		<Label Name="alert_result" Text="No answer yet." Opacity="0.6"/>
+	</Demo>
+</Page>

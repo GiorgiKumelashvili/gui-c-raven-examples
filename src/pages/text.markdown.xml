@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.text.markdown" Title="Typography &amp; Markdown" Subtitle="Labels of any size and color, labels whose text the mouse selects and copies, and labels that render Markdown.">
+	<Demo Title="Sizes and colors">
+		<VBox Spacing="4">
+			<Label Text="Large title" TextSize="34"/>
+			<Label Text="Title" TextSize="24"/>
+			<Label Text="Headline" TextSize="17"/>
+			<Label Text="Body: the quick brown fox jumps over the lazy dog."/>
+			<Label Text="Caption, dimmed" TextSize="11" Opacity="0.55"/>
+			<Label Text="Monospace: Rwindow_create_from_xml_file(path);" Font="monospace"/>
+			<HBox Spacing="12">
+				<Label Text="Accent" Color="#3E63DD"/>
+				<Label Text="Success" Color="#30A46C"/>
+				<Label Text="Warning" Color="#F76B15"/>
+				<Label Text="Danger" Color="#E5484D"/>
+			</HBox>
+		</VBox>
+	</Demo>
+	<Demo Title="Selectable" Note="Selectable=&quot;true&quot;: drag over the text, then Cmd+C.">
+		<Label Selectable="true" Wrap="true" Text="Select this sentence as on a web page and copy it. Raven keeps the selection while the window is laid out again."/>
+	</Demo>
+	<Demo Title="Markdown" Note="Markdown=&quot;true&quot; on a Label.">
+		<Label Markdown="true" Wrap="true"><![CDATA[
+# Release notes
+Raven **1.4** brings *springs* to every popup, ~~fixed~~ improved scrolling and `Rdraw_spring`.
+
+- Docking with tear-off windows
+- Liquid Glass look
+  - refraction at the rim
+  - tinted glass for buttons
+- [x] Live reload of included files
+- [ ] Your feature here
+
+> Interfaces in XML, code in any language.
+
+| Platform | Window system | Status |
+|---|---|---|
+| macOS | Cocoa | ok |
+| Windows | Win32 | ok |
+| Linux | X11, Wayland | ok |
+
+```c
+Rid window = Rwindow_create_from_xml_file("main.xml");
+while (Rwait_frame(-1.0)) { }
+```
+
+[Raven on GitHub](https://github.com/oscar-soirey/Raven) - [a link that fires an action](action:go:custom.datatable)
+]]></Label>
+	</Demo>
+</Page>

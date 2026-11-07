@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.tools.timeline" Title="Timeline" Subtitle="A sequencer: tracks holding clips and keys, markers on the ruler, a playhead. Drag clips to move them, their ends to stretch them; snapping to frames, the playhead and each other.">
+	<Demo Title="Timeline">
+		<Timeline Height="300" Duration="20" FrameRate="24" Snapping="true">
+			<Track Name="Camera" Color="#0A84FF">
+				<Clip Start="0" Length="4.5" Label="Wide shot"/>
+				<Clip Start="5" Length="3" Label="Close-up"/>
+				<Clip Start="8.5" Length="6" Label="Dolly"/>
+				<Key Time="15.5"/>
+			</Track>
+			<Track Name="Music" Color="#BF5AF2">
+				<Clip Start="0" Length="12" Label="Theme" Style="Gradient"/>
+				<Clip Start="12.5" Length="7" Label="Outro" Style="Gradient"/>
+			</Track>
+			<Track Name="Titles" Color="#FF9F0A">
+				<Clip Start="1" Length="2.5" Label="Raven" Style="Outline"/>
+				<Clip Start="16" Length="3" Label="The end" Style="Outline"/>
+			</Track>
+			<Track Name="Light" Color="#30D158">
+				<Key Time="2"/>
+				<Key Time="6"/>
+				<Key Time="9.5"/>
+				<Key Time="13"/>
+			</Track>
+			<Marker Time="4.5" Label="Intro"/>
+			<Marker Time="12" Label="Drop" Color="#FF453A"/>
+		</Timeline>
+	</Demo>
+</Page>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.splitter" Title="Splitter" Subtitle="Panes separated by bars the user drags. The sidebar of this app is one. Splitters nest.">
+	<Demo Title="Three panes, side by side" Note="Slot.Fill sets the first proportions; MinPaneSize stops a drag.">
+		<Splitter Height="200" MinPaneSize="60">
+			<Border Slot.Fill="1" Background="#3E63DD30" CornerRadius="6"><Label Text="Fill 1" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Slot.Fill="2" Background="#8E4EC630" CornerRadius="6"><Label Text="Fill 2" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Border Slot.Fill="1" Background="#D6409F30" CornerRadius="6"><Label Text="Fill 1" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+		</Splitter>
+	</Demo>
+	<Demo Title="Nested: an editor layout">
+		<Splitter Height="280">
+			<Border Slot.Fill="1" Background="#12A59430" CornerRadius="6"><Label Text="Explorer" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			<Splitter Orientation="Vertical" Slot.Fill="3">
+				<Border Slot.Fill="3" Background="#3E63DD30" CornerRadius="6"><Label Text="Editor" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+				<Border Slot.Fill="1" Background="#F76B1530" CornerRadius="6"><Label Text="Terminal" Slot.HAlign="Center" Slot.VAlign="Center"/></Border>
+			</Splitter>
+		</Splitter>
+	</Demo>
+</Page>

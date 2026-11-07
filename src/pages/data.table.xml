@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.data.table" Title="Table" Subtitle="Raven's Table: columns that are resized by dragging the edge of their header (a double click fits them) and sorted by a click; any number of rows (virtual mode). For check boxes in rows, rows that unfold and colored cells, see Custom, Data table.">
+	<Demo Title="Table">
+		<HBox Spacing="16">
+			<Checkbox Text="Striped" Checked="true" OnChanged="table.striped"/>
+			<Checkbox Text="Grid lines" OnChanged="table.grid"/>
+			<Checkbox Text="Header" Checked="true" OnChanged="table.header"/>
+		</HBox>
+		<Table Name="raven_table" Striped="true" Height="320">
+			<Column Header="Element" Width="140"/>
+			<Column Header="Symbol" Width="80" Align="Center"/>
+			<Column Header="Number" Width="80" Align="Right"/>
+			<Column Header="Mass" Width="100" Align="Right"/>
+			<Column Header="Group" Fill="1"/>
+			<Row>Hydrogen|H|1|1.008|Nonmetal</Row>
+			<Row>Helium|He|2|4.0026|Noble gas</Row>
+			<Row>Lithium|Li|3|6.94|Alkali metal</Row>
+			<Row>Beryllium|Be|4|9.0122|Alkaline earth</Row>
+			<Row>Boron|B|5|10.81|Metalloid</Row>
+			<Row>Carbon|C|6|12.011|Nonmetal</Row>
+			<Row>Nitrogen|N|7|14.007|Nonmetal</Row>
+			<Row>Oxygen|O|8|15.999|Nonmetal</Row>
+			<Row>Fluorine|F|9|18.998|Halogen</Row>
+			<Row>Neon|Ne|10|20.180|Noble gas</Row>
+			<Row>Sodium|Na|11|22.990|Alkali metal</Row>
+			<Row>Magnesium|Mg|12|24.305|Alkaline earth</Row>
+			<Row>Aluminium|Al|13|26.982|Post-transition</Row>
+			<Row>Silicon|Si|14|28.085|Metalloid</Row>
+		</Table>
+	</Demo>
+</Page>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.overlay.tooltip" Title="Tooltip" Subtitle="Tooltip=&quot;...&quot; on any widget: shown when the pointer rests on it.">
+	<Demo Title="Rest the pointer on these">
+		<HBox Spacing="12">
+			<Button Text="Save" Style="Primary" Tooltip="Save the document (Cmd+S)"/>
+			<Button Text="Disabled" Enabled="false" Tooltip="Even a disabled button explains itself"/>
+			<Checkbox Text="Autosave" Style="Switch" Checked="true" Tooltip="Saves every 30 seconds" Slot.VAlign="Center"/>
+			<Pill Text="beta" Color="#8E4EC6" Tooltip="This feature may change"/>
+			<Image Source="../icons/star.svg" Width="20" Height="20" Tooltip="An image" Slot.VAlign="Center"/>
+		</HBox>
+		<Slider Value="0.4" Tooltip="Brightness"/>
+		<Label Text="Even a label has one. Rest here." Tooltip="Labels let the mouse through, except for their tooltip" Opacity="0.7"/>
+	</Demo>
+</Page>

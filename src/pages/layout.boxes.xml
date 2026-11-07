@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.layout.boxes" Title="Boxes &amp; grids" Subtitle="Slate-style layout: each child carries a slot (padding, alignment, fill share) read by its parent panel.">
+	<Demo Title="HBox with fill shares" Note="Slot.Fill gives each child a share of the free space; without it a child takes the size it asks for.">
+		<HBox Spacing="8">
+			<Block Text="auto" Color="#3E63DD"/>
+			<Block Text="Fill=1" Color="#8E4EC6" Slot.Fill="1"/>
+			<Block Text="Fill=2" Color="#D6409F" Slot.Fill="2"/>
+			<Block Text="auto" Color="#3E63DD"/>
+		</HBox>
+	</Demo>
+	<Demo Title="VBox with alignment" Note="Slot.HAlign: Fill (default), Left, Center, Right.">
+		<VBox Spacing="6">
+			<Block Text="Fill" Color="#12A594"/>
+			<Block Text="Left" Color="#12A594" Slot.HAlign="Left"/>
+			<Block Text="Center" Color="#12A594" Slot.HAlign="Center"/>
+			<Block Text="Right" Color="#12A594" Slot.HAlign="Right"/>
+		</VBox>
+	</Demo>
+	<Demo Title="Grid" Note="Columns=&quot;auto,1,2&quot;: one entry per track; cells may span.">
+		<Grid Columns="auto,1,2" Rows="auto,auto,auto" Spacing="8" Height="170">
+			<Block Text="auto" Color="#F76B15" Slot.Column="0" Slot.Row="0"/>
+			<Block Text="1 share" Color="#F76B15" Slot.Column="1" Slot.Row="0"/>
+			<Block Text="2 shares" Color="#F76B15" Slot.Column="2" Slot.Row="0"/>
+			<Block Text="ColumnSpan=2" Color="#E5484D" Slot.Column="0" Slot.Row="1" Slot.ColumnSpan="2"/>
+			<Block Text="RowSpan=2" Color="#8E4EC6" Slot.Column="2" Slot.Row="1" Slot.RowSpan="2"/>
+			<Block Text="(0,2)" Color="#3E63DD" Slot.Column="0" Slot.Row="2"/>
+			<Block Text="(1,2)" Color="#3E63DD" Slot.Column="1" Slot.Row="2"/>
+		</Grid>
+	</Demo>
+	<Demo Title="UniformGrid" Note="Cells of the same size, filled row by row.">
+		<UniformGrid Columns="6" Spacing="6">
+			<Repeat Count="12" Var="i">
+				<Block Text="{i + 1}" Color="{i % 3 == 0 ? '#3E63DD' : i % 3 == 1 ? '#12A594' : '#D6409F'}"/>
+			</Repeat>
+		</UniformGrid>
+	</Demo>
+	<Demo Title="WrapBox, with Repeat and ForEach" Note="Children go to the next line when the row is full; resize the sidebar to see them wrap.">
+		<WrapBox Spacing="6">
+			<ForEach Items="Raven|C11|Vulkan|XML|Slate|springs|glass|docking|node graph|timeline|markdown|touch|pen|themes|live reload" Var="tag" Index="n">
+				<Pill Text="{tag}" Color="{n % 2 == 0 ? '#3E63DD' : '#8E4EC6'}"/>
+			</ForEach>
+		</WrapBox>
+	</Demo>
+</Page>

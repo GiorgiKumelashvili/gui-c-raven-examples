@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.tools.nodes" Title="Node graph" Subtitle="Nodes with typed pins and any widgets inside, linked by wires that hang and swing. Drag from a pin to link, drag the canvas to pan, wheel or pinch to zoom.">
+	<Demo Title="NodeGraph">
+		<NodeGraph Height="440" FrameAll="true" Flow="Auto">
+			<Type Name="number" Color="#64D2FF"/>
+			<Type Name="color" Color="#FF9F0A"/>
+			<Type Name="shader" Color="#30D158"/>
+			<Node Name="noise" Title="Noise" X="20" Y="40" Color="#5E5CE6">
+				<Output Name="value" Label="Value" Type="number"/>
+				<Slider Value="0.4" Width="150"/>
+			</Node>
+			<Node Name="tint" Title="Tint" X="20" Y="210" Color="#FF9F0A">
+				<Output Name="color" Label="Color" Type="color"/>
+				<ColorPicker Color="#FF9F0A" Popup="true"/>
+			</Node>
+			<Node Name="mix" Title="Mix" X="290" Y="100" Color="#BF5AF2">
+				<Input Name="factor" Label="Factor" Type="number"/>
+				<Input Name="color" Label="Color" Type="color"/>
+				<Output Name="out" Label="Shader" Type="shader"/>
+				<ComboBox Items="Multiply|Screen|Overlay" Selected="0" Width="140"/>
+			</Node>
+			<Node Name="output" Title="Material output" X="540" Y="130" Color="#30D158">
+				<Input Name="surface" Label="Surface" Type="shader"/>
+				<Input Name="displace" Label="Displacement" Type="number"/>
+			</Node>
+			<Link From="noise.value" To="mix.factor"/>
+			<Link From="tint.color" To="mix.color"/>
+			<Link From="mix.out" To="output.surface"/>
+		</NodeGraph>
+	</Demo>
+</Page>

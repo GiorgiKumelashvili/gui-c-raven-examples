@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tags declared in XML for this app. Each <Widget Name="..."> becomes a tag;
+  its other attributes are parameters with their defaults, and {...} inside
+  is computed from them. See third_party/Raven/docs/XML.md, "Declaring tags".
+-->
+<Widgets>
+	<!-- a small colored label -->
+	<Widget Name="Pill" Text="new" Color="#3E63DD">
+		<Border Background="{Color}" CornerRadius="100" Padding="8,2" Slot.VAlign="Center">
+			<Label Text="{upper(Text)}" TextSize="10" Color="white"/>
+		</Border>
+	</Widget>
+
+	<!-- one page of the gallery: a title, what it shows, then the demos -->
+	<Widget Name="Page" Title="" Subtitle="" Kind="Raven">
+		<ScrollBox>
+			<VBox Spacing="18" Slot.Padding="32,24,32,48">
+				<VBox Spacing="6">
+					<HBox Spacing="12">
+						<Label Text="{Title}" TextSize="28" Slot.VAlign="Center"/>
+						<Pill Text="{Kind == 'Custom' ? 'custom' : 'raven'}" Color="{Kind == 'Custom' ? '#F76B15' : '#3E63DD'}"/>
+					</HBox>
+					<Label Text="{Subtitle}" Wrap="true" Opacity="0.65"/>
+				</VBox>
+				<Children/>
+			</VBox>
+		</ScrollBox>
+	</Widget>
+
+	<!-- a card holding one demo -->
+	<Widget Name="Demo" Title="" Note="">
+		<Border Padding="20" CornerRadius="12" BorderWidth="1">
+			<VBox Spacing="14">
+				<VBox Spacing="3">
+					<Label Text="{Title}" TextSize="16"/>
+					<Label If="{!empty(Note)}" Text="{Note}" Wrap="true" Opacity="0.6" TextSize="12"/>
+				</VBox>
+				<Children/>
+			</VBox>
+		</Border>
+	</Widget>
+
+	<!-- a caption beside a control -->
+	<Widget Name="Field" Label="" LabelWidth="150">
+		<HBox Spacing="12">
+			<Label Text="{Label}" Width="{LabelWidth}" Opacity="0.75" Slot.VAlign="Center"/>
+			<Children/>
+		</HBox>
+	</Widget>
+
+	<!-- a colored block for the layout demos -->
+	<Widget Name="Block" Text="" Color="#3E63DD">
+		<Border Background="{Color}" CornerRadius="8" Padding="12,10">
+			<Label Text="{Text}" Color="white" Slot.HAlign="Center" Slot.VAlign="Center"/>
+		</Border>
+	</Widget>
+
+	<!-- a card of the welcome page that leads to a page -->
+	<Widget Name="QuickLink" Title="" Text="" Go="home">
+		<Button OnClicked="go:{Go}">
+			<VBox Spacing="4" Slot.Padding="8,10">
+				<Label Text="{Title}" TextSize="15"/>
+				<Label Text="{Text}" Wrap="true" Opacity="0.6" TextSize="12"/>
+			</VBox>
+		</Button>
+	</Widget>
+
+	<!-- the same few controls, worn by a look of Raven (Theme on any widget) -->
+	<Widget Name="LookPreview" Look="RavenDark" Caption="">
+		<Border Theme="{Look}" Padding="16" CornerRadius="12" BorderWidth="1">
+			<VBox Spacing="10">
+				<HBox Spacing="8">
+					<Label Text="{Caption}" TextSize="15" Slot.Fill="1" Slot.VAlign="Center"/>
+					<Button Text="Use" Style="Flat" OnClicked="theme:{Look}"/>
+				</HBox>
+				<HBox Spacing="8">
+					<Button Text="Primary" Style="Primary"/>
+					<Button Text="Default"/>
+					<Checkbox Text="Switch" Style="Switch" Checked="true" Slot.VAlign="Center"/>
+				</HBox>
+				<HBox Spacing="8">
+					<TextInput Placeholder="Search..." Slot.Fill="1"/>
+					<ComboBox Items="Daily|Weekly|Monthly" Selected="1"/>
+				</HBox>
+				<Slider Value="0.6"/>
+			</VBox>
+		</Border>
+	</Widget>
+
+	<!--
+	  Button group (custom). Raven has no button group: a bordered track with
+	  flat buttons inside. OnClicked="bg.select" makes the group exclusive
+	  (demos.c turns the clicked one Primary), "bg.toggle" makes each a toggle.
+	-->
+	<Widget Name="ButtonGroup" Gap="2">
+		<Border CornerRadius="9" BorderWidth="1" Padding="3" Slot.HAlign="Left">
+			<HBox Spacing="{Gap}">
+				<Children/>
+			</HBox>
+		</Border>
+	</Widget>
+	<Widget Name="ButtonGroupFill" Gap="2">
+		<Border CornerRadius="9" BorderWidth="1" Padding="3">
+			<HBox Spacing="{Gap}">
+				<Children/>
+			</HBox>
+		</Border>
+	</Widget>
+
+	<!--
+	  File input (custom), as in Blueprint: the name of the file chosen, and a
+	  button that opens the file dialog of the system. Kind: "" any file,
+	  images, documents, multi, folder, raven (Raven's own browser).
+	  demos.c writes the name into the first child of the row.
+	-->
+	<Widget Name="FileInput" Placeholder="Choose file..." Browse="Browse" Kind="">
+		<Border CornerRadius="7" BorderWidth="1" Padding="3">
+			<HBox Spacing="6">
+				<Label Text="{Placeholder}" Opacity="0.5" Slot.Fill="1" Slot.VAlign="Center" Slot.Padding="8,0"/>
+				<Button Text="{Browse}" OnClicked="{empty(Kind) ? 'file.browse' : 'file.browse:' + Kind}"/>
+			</HBox>
+		</Border>
+	</Widget>
+</Widgets>

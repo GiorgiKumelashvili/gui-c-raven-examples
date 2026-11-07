@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.overlay.progress" Title="Progress" Subtitle="ProgressBar shows how far something is. Here a frame callback (Rset_frame_callback) moves it while the window draws continuously.">
+	<Demo Title="ProgressBar">
+		<Label Name="progress_label" Text="Ready."/>
+		<ProgressBar Name="progress_main" Value="0"/>
+		<ProgressBar Name="progress_small" Value="0" Height="4" Color.Accent="#30A46C"/>
+		<HBox Spacing="10">
+			<Button Text="Start" Style="Primary" OnClicked="progress.start"/>
+			<Button Text="Pause" OnClicked="progress.pause"/>
+			<Button Text="Reset" Style="Flat" OnClicked="progress.reset"/>
+		</HBox>
+	</Demo>
+	<Demo Title="Static values">
+		<VBox Spacing="10">
+			<ProgressBar Value="0.15" Color.Accent="#E5484D"/>
+			<ProgressBar Value="0.5" Color.Accent="#F76B15"/>
+			<ProgressBar Value="0.85" Color.Accent="#30A46C"/>
+		</VBox>
+	</Demo>
+</Page>

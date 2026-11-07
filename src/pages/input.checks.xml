@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.input.checks" Title="Checks &amp; switches" Subtitle="Checkbox has three styles: Check, Radio and Switch. Radio boxes of the same parent are exclusive.">
+	<UniformGrid Columns="3" Spacing="14">
+		<Demo Title="Check">
+			<VBox Spacing="8">
+				<Checkbox Text="Email notifications" Checked="true"/>
+				<Checkbox Text="Weekly digest"/>
+				<Checkbox Text="Disabled" Enabled="false"/>
+				<Checkbox Text="Disabled, checked" Checked="true" Enabled="false"/>
+			</VBox>
+		</Demo>
+		<Demo Title="Radio">
+			<VBox Spacing="8">
+				<Checkbox Text="Small" Style="Radio"/>
+				<Checkbox Text="Medium" Style="Radio" Checked="true"/>
+				<Checkbox Text="Large" Style="Radio"/>
+				<Checkbox Text="Extra large" Style="Radio" Enabled="false"/>
+			</VBox>
+		</Demo>
+		<Demo Title="Switch">
+			<VBox Spacing="8">
+				<Checkbox Text="Wi-Fi" Style="Switch" Checked="true"/>
+				<Checkbox Text="Bluetooth" Style="Switch"/>
+				<Checkbox Text="AirDrop" Style="Switch" Checked="true" Color.Accent="#30A46C"/>
+				<Checkbox Text="Disabled" Style="Switch" Enabled="false"/>
+			</VBox>
+		</Demo>
+	</UniformGrid>
+</Page>

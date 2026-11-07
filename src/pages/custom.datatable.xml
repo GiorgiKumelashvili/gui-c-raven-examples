@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.datatable" Kind="Custom" Title="Data table" Subtitle="A CUSTOM widget painted with Raven's drawing API (src/datatable.c) and registered as the tag &lt;DataTable&gt;. Click a row or its box to toggle it, the box of the header for all; the chevron (or a double click) unfolds a row; drag the edge of a header to resize a column, double click it to fit; click a header to sort. Shift + wheel scrolls sideways.">
+	<Demo Title="DataTable">
+		<HBox Spacing="8">
+			<ButtonGroup>
+				<Button Text="Select all" Style="Flat" OnClicked="dt.check-all"/>
+				<Button Text="Invert" Style="Flat" OnClicked="dt.invert"/>
+				<Button Text="Clear" Style="Flat" OnClicked="dt.check-none"/>
+			</ButtonGroup>
+			<ButtonGroup>
+				<Button Text="Expand all" Style="Flat" OnClicked="dt.expand-all"/>
+				<Button Text="Collapse all" Style="Flat" OnClicked="dt.collapse-all"/>
+			</ButtonGroup>
+			<Button Text="Reset columns" Style="Flat" OnClicked="dt.reset-columns" Slot.VAlign="Center"/>
+			<Spacer Slot.Fill="1"/>
+			<Label Name="dt_status" Text="0 of 24 rows selected" Opacity="0.6" Slot.VAlign="Center"/>
+		</HBox>
+		<DataTable Name="datatable" Height="460" Rows="24" OnChanged="dt.changed"/>
+		<HBox Spacing="8">
+			<Label Text="Tiles:" Opacity="0.6" Slot.VAlign="Center"/>
+			<Pill Text="status pill" Color="#30A46C"/>
+			<Pill Text="priority tile" Color="#DC3545"/>
+			<Pill Text="heat cell" Color="#F76B15"/>
+			<Pill Text="progress" Color="#3E63DD"/>
+		</HBox>
+	</Demo>
+</Page>
