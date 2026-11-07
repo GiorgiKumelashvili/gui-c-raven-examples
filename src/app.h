@@ -71,6 +71,10 @@ int roundlist_get_selected(Rid list);
 void roundlist_set_selected(Rid list, int index);
 void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void* user_data);
 
+/* scroll_contain.c: the wheel stays in the widget that scrolls; Class="no-bounce" ScrollBoxes */
+void scroll_contain_init(void);
+void scroll_contain_bind(void);
+
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);
 
@@ -183,6 +187,10 @@ void roundlist_set_items(Rid list, int count, const char* const* titles, const c
 int roundlist_get_selected(Rid list);
 void roundlist_set_selected(Rid list, int index);
 void roundlist_set_activate_callback(Rid list, RoundListCallback callback, void* user_data);
+
+/* scroll_contain.c: the wheel stays in the widget that scrolls; Class="no-bounce" ScrollBoxes */
+void scroll_contain_init(void);
+void scroll_contain_bind(void);
 
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);

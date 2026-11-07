@@ -18,12 +18,17 @@
 
 Rid g_window = R_INVALID_ID;
 
-#define MAX_HOOKS 8
+#define MAX_HOOKS 32
 static AppEventHook g_hooks[MAX_HOOKS];
 static int g_hook_count;
 
 void app_add_event_hook(AppEventHook hook) {
-	if (g_hook_count < MAX_HOOKS) g_hooks[g_hook_count++] = hook;
+	if (g_hook_count == MAX_HOOKS) {
+		/* a hook that silently does nothing is a bug hard to find: say it */
+		fprintf(stderr, "[app] too many event hooks (%d): raise MAX_HOOKS in main.c\n", MAX_HOOKS);
+		return;
+	}
+	g_hooks[g_hook_count++] = hook;
 }
 
 static int window_hook(Rid window, const REvent* event, void* user_data) {
@@ -85,6 +90,7 @@ static void on_reload(const char* path, int ok, void* user_data) {
 	vlist_bind_widgets();
 	http_bind_widgets();
 	tooltip_scan();
+	scroll_contain_bind();
 }
 
 int main(void) {
@@ -110,6 +116,7 @@ int main(void) {
 	omnibar_init();
 	app_modal_init();
 	tooltip_init();
+	scroll_contain_init();
 
 	/* APP_THEME=MacOSLight: start with another look */
 	if (getenv("APP_THEME")) Rtheme_use(getenv("APP_THEME"));
@@ -128,6 +135,7 @@ int main(void) {
 	vlist_bind_widgets();
 	http_bind_widgets();
 	tooltip_scan();
+	scroll_contain_bind();
 	/* APP_PAGE=custom.datatable ./build/raven_app opens on that page */
 	if (getenv("APP_PAGE")) nav_go(getenv("APP_PAGE"));
 

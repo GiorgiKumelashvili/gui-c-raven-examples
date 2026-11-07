@@ -25,6 +25,7 @@ set(APP_SOURCES
 	src/canvas_demo.c
 	src/http.c
 	src/roundlist.c
+	src/scroll_contain.c
 	src/selftest.c
 )
 

@@ -23,6 +23,16 @@ static void click_at(float x, float y) {
 	pump(0.15);
 }
 
+static Rid find_type(Rid widget, RWidgetType type) {
+	int i;
+	if (Rwidget_get_type(widget) == type) return widget;
+	for (i = 0; i < Rwidget_get_child_count(widget); i++) {
+		Rid found = find_type(Rwidget_get_child(widget, i), type);
+		if (found != R_INVALID_ID) return found;
+	}
+	return R_INVALID_ID;
+}
+
 void selftest_run(const char* name) {
 	float x, y, w, h;
 	pump(1.0);
@@ -184,6 +194,41 @@ void selftest_run(const char* name) {
 			}
 		}
 		Rwindow_inject_mouse_move(g_window, 1300, 400);
+	} else if (strcmp(name, "contain") == 0) {
+		/* the pointer on a code editor of a long page: scroll far past the editor's end;
+		 * the page must not move. Then outside of it: the page moves. */
+		int i;
+		float px, py, py0, page_x, page_y, pw, ph;
+		Rid page, editor;
+		nav_go("custom.scrollspeed");
+		pump(0.4);
+		page = Rwidget_find(g_window, "page.custom.scrollspeed");
+		editor = find_type(page, R_WIDGET_TEXT_EDITOR);
+		Rwidget_get_rect(page, &page_x, &page_y, &pw, &ph);
+		Rwidget_get_rect(editor, &x, &y, &w, &h);
+		Rscroll_box_set_offset(page, 0.0f, y - page_y - 120.0f);
+		pump(0.6);
+		Rscroll_box_get_offset(page, &px, &py0);
+		Rwidget_get_rect(editor, &x, &y, &w, &h);
+		Rwindow_inject_mouse_move(g_window, x + w * 0.5f, y + h * 0.5f);
+		pump(0.1);
+		for (i = 0; i < 60; i++) {
+			Rwindow_inject_mouse_wheel(g_window, 0.0f, -2.0f);
+			pump(0.02);
+		}
+		pump(0.4);
+		Rscroll_box_get_offset(page, &px, &py);
+		fprintf(stderr, "[selftest] page offset %.0f -> %.0f after 60 wheel steps over the editor\n", py0, py);
+		py0 = py;
+		Rwindow_inject_mouse_move(g_window, page_x + pw - 20.0f, y + h * 0.5f);
+		pump(0.1);
+		for (i = 0; i < 5; i++) {
+			Rwindow_inject_mouse_wheel(g_window, 0.0f, -2.0f);
+			pump(0.02);
+		}
+		pump(0.4);
+		Rscroll_box_get_offset(page, &px, &py);
+		fprintf(stderr, "[selftest] page offset %.0f -> %.0f after 5 steps beside it\n", py0, py);
 	} else if (strcmp(name, "neo") == 0) {
 		nav_go("custom.accordion");
 		pump(0.3);

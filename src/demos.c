@@ -221,7 +221,7 @@ static float g_pointer_x, g_pointer_y;
 
 #define RAIL_GAP 0.25      /* seconds without wheel: a new gesture */
 #define RAIL_DECIDE 0.35f  /* lines of motion before the axis is chosen */
-#define RAIL_RATIO 2.5f    /* sideways must be this many times the vertical motion to win */
+#define RAIL_RATIO 1.8f    /* sideways must be this many times the vertical motion to win */
 static int g_rail;         /* 0 undecided, 1 vertical, 2 horizontal, 3 free (diagonal) */
 static float g_rail_x, g_rail_y;
 

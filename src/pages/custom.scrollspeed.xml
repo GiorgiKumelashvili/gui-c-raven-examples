@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Page Name="page.custom.scrollspeed" Kind="Custom" Title="Scroll speeds" Subtitle="The same content at five speeds. Raven scrolls every widget at the speed of the system; here a widget with Class=&quot;scroll-speed-N&quot; (and what it contains) scrolls at N percent: the window hook scales the wheel before the widget sees it (demos.c). The whole app also keeps each swipe on its main axis (rails), so a vertical swipe no longer drifts sideways.">
-	<Demo Title="ScrollBox" Note="Put the pointer over a column and scroll the same amount in each.">
+	<Demo Title="ScrollBox" Note="Put the pointer over a column and scroll the same amount in each: the numbers show how far each went.">
 		<UniformGrid Columns="5" Spacing="10">
 			<VBox Spacing="6">
 				<Label Text="0.25x  (slow)" TextAlign="Center" Opacity="0.7"/>
 				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
 					<ScrollBox Class="scroll-speed-25">
 						<VBox Spacing="0">
-							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+							<Repeat Count="24" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat>
 						</VBox>
 					</ScrollBox>
 				</Border>
@@ -17,7 +17,7 @@
 				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
 					<ScrollBox Class="scroll-speed-50">
 						<VBox Spacing="0">
-							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+							<Repeat Count="24" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat>
 						</VBox>
 					</ScrollBox>
 				</Border>
@@ -27,7 +27,7 @@
 				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
 					<ScrollBox>
 						<VBox Spacing="0">
-							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+							<Repeat Count="24" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat>
 						</VBox>
 					</ScrollBox>
 				</Border>
@@ -37,7 +37,7 @@
 				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
 					<ScrollBox Class="scroll-speed-200">
 						<VBox Spacing="0">
-							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+							<Repeat Count="24" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat>
 						</VBox>
 					</ScrollBox>
 				</Border>
@@ -47,7 +47,7 @@
 				<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="340">
 					<ScrollBox Class="scroll-speed-400">
 						<VBox Spacing="0">
-							<Repeat Count="120" Var="i"><Label Text="Line {i + 1}" Slot.Padding="12,5" Opacity="{i % 10 == 9 ? 1 : 0.7}"/></Repeat>
+							<Repeat Count="24" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat>
 						</VBox>
 					</ScrollBox>
 				</Border>
@@ -100,12 +100,46 @@ int main(void) {
 /* the end */]]></TextEditor>
 		</HBox>
 	</Demo>
-	<Demo Title="Rails" Note="A swipe is locked to its main axis once it has gone a third of a line; to scroll sideways, swipe clearly sideways (2.5 times more than up or down). Shift + wheel is always sideways.">
+	<Demo Title="No bounce at the ends" Note="Raven stretches the content past an end and springs it back. Class=&quot;no-bounce&quot; on a ScrollBox (src/scroll_contain.c) drops the wheel that pushes against an end it has reached: it simply stops.">
+		<HBox Spacing="12" Height="260">
+			<VBox Spacing="6" Slot.Fill="1">
+				<Label Text="Raven's default: stretches and springs back" Opacity="0.7" TextSize="12"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Slot.Fill="1">
+					<ScrollBox>
+						<VBox Spacing="0"><Repeat Count="6" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat></VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+			<VBox Spacing="6" Slot.Fill="1">
+				<Label Text="no-bounce: stops dead at the top and the bottom" Opacity="0.7" TextSize="12"/>
+				<Border CornerRadius="10" BorderWidth="1" Padding="0" Slot.Fill="1">
+					<ScrollBox Class="no-bounce">
+						<VBox Spacing="0"><Repeat Count="6" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat></VBox>
+					</ScrollBox>
+				</Border>
+			</VBox>
+		</HBox>
+	</Demo>
+	<Demo Title="The wheel stays inside" Note="For the whole app: a widget that scrolls keeps the wheel at its ends, as overscroll-behavior: contain on the web; the page only scrolls when the pointer is outside of it, or over something that does not scroll. Class=&quot;scroll-chain&quot; gives a widget Raven's behavior back (right).">
+		<HBox Spacing="12" Height="200">
+			<Border CornerRadius="10" BorderWidth="1" Padding="0" Slot.Fill="1">
+				<ScrollBox>
+					<VBox Spacing="0"><Repeat Count="4" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat></VBox>
+				</ScrollBox>
+			</Border>
+			<Border CornerRadius="10" BorderWidth="1" Padding="0" Slot.Fill="1">
+				<ScrollBox Class="scroll-chain">
+					<VBox Spacing="0"><Repeat Count="4" Var="r"><ForEach Items="Lorem ipsum dolor sit amet, consectetur adipiscing elit.|Sed do eiusmod tempor incididunt ut labore et dolore.|Ut enim ad minim veniam, quis nostrud exercitation.|Duis aute irure dolor in reprehenderit in voluptate.|Excepteur sint occaecat cupidatat non proident." Var="t" Index="n"><Label Text="{r * 5 + n + 1}. {t}" Wrap="true" TextSize="12" Slot.Padding="12,5" Opacity="{(r * 5 + n) % 10 == 9 ? 1 : 0.75}"/></ForEach></Repeat></VBox>
+				</ScrollBox>
+			</Border>
+		</HBox>
+	</Demo>
+	<Demo Title="Rails" Note="A swipe is locked to its main axis once it has gone a third of a line; to scroll sideways, swipe clearly sideways (1.8 times more than up or down). Shift + wheel is always sideways.">
 		<Border CornerRadius="10" BorderWidth="1" Padding="0" Height="180">
 			<ScrollBox ScrollBoth="true">
 				<VBox Spacing="0">
 					<Repeat Count="40" Var="i">
-						<Label Font="monospace" Text="{i + 1}  - a long line that goes far to the right, so that the box scrolls both ways: ......................................................................................................................." Slot.Padding="12,4"/>
+						<Label Text="{i + 1}.  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." Slot.Padding="12,4"/>
 					</Repeat>
 				</VBox>
 			</ScrollBox>
