@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page Name="page.custom.multiwindow" Kind="Custom" Title="Windows and shared state" Subtitle="One number, kept in C (src/multiwindow.c), shown here and in every window opened from here. Each window is a Raven window of its own, built from src/windows/counter.xml; its button fires the same action as the one below, and every label is written again after a change.">
+	<Demo Title="Shared counter">
+		<HBox Spacing="28">
+			<Label Name="mw_count" Text="0" TextSize="56" MinWidth="110" TextAlign="Center" Slot.VAlign="Center"/>
+			<VBox Spacing="10" Slot.VAlign="Center">
+				<HBox Spacing="10">
+					<Button Text="Open a new window" OnClicked="mw.open"/>
+					<Button Text="Increment" Style="Primary" OnClicked="mw.increment"/>
+				</HBox>
+				<HBox Spacing="10">
+					<Button Text="Reset" Style="Flat" OnClicked="mw.reset"/>
+					<Button Text="Close all windows" Style="Flat" OnClicked="mw.close_all"/>
+					<Label Name="mw_status" Text="0 windows open" Opacity="0.55" Slot.VAlign="Center"/>
+				</HBox>
+			</VBox>
+		</HBox>
+	</Demo>
+</Page>

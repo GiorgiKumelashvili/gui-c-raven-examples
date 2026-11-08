@@ -170,6 +170,7 @@
 						<Include Source="pages/custom.accordion.xml"/>
 						<Include Source="pages/custom.http.xml"/>
 						<Include Source="pages/custom.scrollspeed.xml"/>
+						<Include Source="pages/custom.multiwindow.xml"/>
 						<Include Source="pages/custom.datatable.xml"/>
 						<Include Source="pages/custom.buttongroup.xml"/>
 						<Include Source="pages/custom.segmented.xml"/>

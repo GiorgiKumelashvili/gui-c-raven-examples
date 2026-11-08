@@ -26,6 +26,7 @@ set(APP_SOURCES
 	src/http.c
 	src/roundlist.c
 	src/scroll_contain.c
+	src/multiwindow.c
 	src/selftest.c
 )
 

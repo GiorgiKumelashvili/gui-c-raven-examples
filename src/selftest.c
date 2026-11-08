@@ -229,6 +229,37 @@ void selftest_run(const char* name) {
 		pump(0.4);
 		Rscroll_box_get_offset(page, &px, &py);
 		fprintf(stderr, "[selftest] page offset %.0f -> %.0f after 5 steps beside it\n", py0, py);
+	} else if (strcmp(name, "multiwindow") == 0) {
+		/* two windows, then increments from the page and from the windows */
+		Rid page;
+		nav_go("custom.multiwindow");
+		pump(0.3);
+		page = Rwidget_find(g_window, "pages");
+		Raction_fire("mw.open", page);
+		Raction_fire("mw.open", page);
+		pump(0.5);
+		Raction_fire("mw.increment", page);
+		Raction_fire("mw.increment", page);
+		Raction_fire("mw.increment", page);
+		pump(0.3);
+		fprintf(stderr, "[selftest] page shows %s, %s\n", Rlabel_get_text(Rwidget_find(g_window, "mw_count")),
+			Rlabel_get_text(Rwidget_find(g_window, "mw_status")));
+		{
+			/* the button of the second window, clicked for real: the action comes from that window */
+			Rid second = multiwindow_window(1), button;
+			int i;
+			button = find_type(Rwindow_get_content(second), R_WIDGET_BUTTON);
+			Rwidget_get_rect(button, &x, &y, &w, &h);
+			Rwindow_inject_mouse_move(second, x + w * 0.5f, y + h * 0.5f);
+			Rwindow_inject_mouse_button(second, R_MOUSE_LEFT, R_TRUE);
+			Rwindow_inject_mouse_button(second, R_MOUSE_LEFT, R_FALSE);
+			pump(0.3);
+			for (i = 0; i < multiwindow_count(); i++) {
+				fprintf(stderr, "[selftest] window %d shows %s, %s\n", i + 1, Rlabel_get_text(Rwidget_find(multiwindow_window(i), "mw_count")),
+					Rlabel_get_text(Rwidget_find(multiwindow_window(i), "mw_status")));
+			}
+			fprintf(stderr, "[selftest] page shows %s\n", Rlabel_get_text(Rwidget_find(g_window, "mw_count")));
+		}
 	} else if (strcmp(name, "neo") == 0) {
 		nav_go("custom.accordion");
 		pump(0.3);

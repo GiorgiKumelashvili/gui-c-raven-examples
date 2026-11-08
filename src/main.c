@@ -89,6 +89,7 @@ static void on_reload(const char* path, int ok, void* user_data) {
 	omnibar_bind_widgets();
 	vlist_bind_widgets();
 	http_bind_widgets();
+	multiwindow_bind_widgets();
 	tooltip_scan();
 	scroll_contain_bind();
 }
@@ -110,6 +111,7 @@ int main(void) {
 	roundlist_register();
 	vlist_init();
 	http_init();
+	multiwindow_init();
 	demos_init();
 	popover_init();
 	reorder_init();
@@ -135,6 +137,7 @@ int main(void) {
 	omnibar_bind_widgets();
 	vlist_bind_widgets();
 	http_bind_widgets();
+	multiwindow_bind_widgets();
 	tooltip_scan();
 	scroll_contain_bind();
 	/* APP_PAGE=custom.datatable ./build/raven_app opens on that page */

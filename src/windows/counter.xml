@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A second window (src/multiwindow.c opens as many as asked). Its count is
+  the one of the main window: the button adds one everywhere.
+-->
+<Window Title="Counter" Width="320" Height="260" MinWidth="240" MinHeight="200">
+	<Shortcut Keys="Super+W" Action="window.close"/>
+	<Border Padding="24" CornerRadius="0">
+		<VBox Spacing="14" Slot.VAlign="Center">
+			<Label Text="Shared count" Opacity="0.6" Slot.HAlign="Center"/>
+			<Label Name="mw_count" Text="0" TextSize="56" Slot.HAlign="Center"/>
+			<Button Text="Increment" Style="Primary" OnClicked="mw.increment" Slot.HAlign="Center" MinWidth="140"/>
+			<Label Name="mw_status" TextSize="11" Opacity="0.5" Slot.HAlign="Center"/>
+		</VBox>
+	</Border>
+</Window>

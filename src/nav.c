@@ -55,7 +55,7 @@ static const NavEntry k_custom[] = {
 	{ "custom.fileinput", "File input" }, { "custom.textarea", "Plain textarea" },
 	{ "custom.virtual", "Virtual list (1M rows)" }, { "custom.canvas", "Canvas" },
 	{ "custom.accordion", "Accordion" }, { "custom.http", "Simple HTTP" },
-	{ "custom.scrollspeed", "Scroll speeds" },
+	{ "custom.scrollspeed", "Scroll speeds" }, { "custom.multiwindow", "Windows & shared state" },
 };
 
 static const NavSection k_sections[] = {

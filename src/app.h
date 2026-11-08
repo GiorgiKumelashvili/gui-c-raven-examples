@@ -78,6 +78,12 @@ void scroll_contain_bind(void);
 /* native_macos.m: draw the window while its edge is dragged (instead of stretching the last frame) */
 int native_live_resize_enable(Rid window);
 
+/* multiwindow.c: one count shown in the page and in windows of their own */
+void multiwindow_init(void);
+void multiwindow_bind_widgets(void);
+int multiwindow_count(void);
+Rid multiwindow_window(int index);
+
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);
 
@@ -197,6 +203,12 @@ void scroll_contain_bind(void);
 
 /* native_macos.m: draw the window while its edge is dragged (instead of stretching the last frame) */
 int native_live_resize_enable(Rid window);
+
+/* multiwindow.c: one count shown in the page and in windows of their own */
+void multiwindow_init(void);
+void multiwindow_bind_widgets(void);
+int multiwindow_count(void);
+Rid multiwindow_window(int index);
 
 /* selftest.c: debug, drives the window with injected input (APP_TEST) */
 void selftest_run(const char* name);
